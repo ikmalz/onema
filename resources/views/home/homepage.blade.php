@@ -589,6 +589,10 @@
                 text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.7);
             }
         }
+
+        .shadow-custom {
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.45);
+        }
     </style>
 </head>
 
@@ -639,10 +643,11 @@
                                 <span class="text-white font-semibold text-sm ml-2">Menu</span>
                             </a>
                             <div class="h-6 border-l border-gray-400 mx-2"></div>
-                            <a href="link-ke-watchlist" class="flex items-center">
+                            <a href="{{ route('watchlist') }}" class="flex items-center">
                                 <i class='bx bxs-bookmark-star text-white font-bold' style="font-size: 24px;"></i>
                                 <span class="text-white font-semibold text-sm ml-2">Watchlist</span>
                             </a>
+
                         </div>
 
                         <!-- Kontainer Login/Logout -->
@@ -837,7 +842,7 @@
             <div class="text-center p-6 border-b">
                 <div class="relative w-24 h-24 mx-auto">
                     <!-- Gambar Profil -->
-                    <img class="h-24 w-24 rounded-full mx-auto" src="{{ Auth::user()->profile_photo_url ?? 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="{{ Auth::user()->name }}" />
+                    <img class="h-24 w-24 rounded-full mx-auto" src="{{ Auth::user()->profile_photo_url ?? 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="" />
 
                     <!-- Ikon Tambah -->
                     <form action="" method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0">
@@ -849,7 +854,7 @@
                     </form>
                 </div>
                 <p class="pt-2 text-lg font-semibold">{{ optional(Auth::user())->username }}</p>
-                <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
+                <p class="text-sm text-gray-600">{{ optional(Auth::user())->email }}</p>
                 <div class="mt-5">
                     <a href="#" class="border rounded-full py-2 px-4 text-xs font-semibold text-gray-700">Manage your Google Account</a>
                 </div>
@@ -1107,9 +1112,9 @@
                                 <div class="absolute bottom-10 left-0 w-full flex items-center px-8">
 
                                     <div class="poster-container h-[200px] w-[140px] flex-shrink-0 mr-6 relative">
-                                    <a href="{{ route('home.detail', $item->id) }}">
-                                        <img src="{{ asset('upload/' . $item->poster) }}" alt="Poster" class="w-full h-full object-cover rounded-lg shadow-lg" />
-                                    </a>
+                                        <a href="{{ route('home.detail', $item->id) }}">
+                                            <img src="{{ asset('upload/' . $item->poster) }}" alt="Poster" class="w-full h-full object-cover rounded-lg shadow-lg" />
+                                        </a>
                                         <div class="absolute -top-1 -left-1">
                                             <div class="relative">
                                                 <i class='bx bxs-bookmark text-gray-500 text-4xl'></i>
@@ -1150,13 +1155,13 @@
 
 
                 <!-- Recommendations Section -->
-                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8"> <!-- Tambahkan margin kiri -->
+                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8">
                     <h1 class="text-black text-xl font-bold px-4 py-2 rounded-r-lg">
                         <span class="border-l-4 border-black pl-2">Recommended Movies</span>
                     </h1>
                     <section class="flex flex-col space-y-4 mt-4">
                         @foreach ($recommendations as $recommendation)
-                        <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs">
+                        <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs shadow-custom">
                             <!-- Video Thumbnail -->
                             <div class="flex-shrink-0 w-1/4 relative">
                                 <a href="{{ route('home.detail', $recommendation->id) }}">
@@ -1223,14 +1228,22 @@
                         </div>
                         <div class="bg-black bg-opacity-75 p-2 rounded-b-2xl">
                             <h3 class="text-sm">Official trailer</h3>
-                            <h3 class="text-lg mt-1 font-semibold mb-2 truncate">{{$trailers->title}}</h3>
+                            <h3 class="text-lg mt-1 font-semibold mb-2 truncate">{{ $trailers->title }}</h3>
                             <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium">{{$trailers->populer}} | {{$trailers->tahun}}</span>
+                                <span class="text-sm font-medium">{{ $trailers->populer }} | {{ $trailers->tahun }}</span>
                             </div>
                             <div class="flex items-center mt-4 mb-5">
                                 <i class='bx bx-like mr-2 cursor-pointer' id="like-{{ $loop->index }}"></i>
-                                <span id="like-count-{{ $loop->index }}"></span>
-                                <i class='bx bx-bookmark ml-10 cursor-pointer text-xl' id="bookmark-{{ $loop->index }}"></i>
+                                <span id="like-count-{{ $loop->index }}">{{ $trailers->likes_count }}</span>
+                                <i class='bx bx-dislike ml-4 mr-2 cursor-pointer' id="dislike-{{ $loop->index }}"></i>
+                                <span id="dislike-count-{{ $loop->index }}">{{ $trailers->dislikes_count }}</span>
+                                @if($trailers->count())
+                                @foreach($trailers as $trailer)
+                                <i class='bx bx-bookmark ml-10 cursor-pointer text-xl' id="bookmark-{{ $loop->index }}" data-trailer-id="{{ $trailer->id }}"></i>
+                                @endforeach
+                                @else
+                                <p>No trailers available</p>
+                                @endif
                             </div>
                         </div>
                     </li>
@@ -1239,7 +1252,6 @@
             </section>
         </div>
     </div>
-
     <!--end home-->
 
     <script>
@@ -1283,29 +1295,29 @@
 
                         data.forEach(item => {
                             recommendationsSection.innerHTML += `
-                    <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs">
-                        <div class="flex-shrink-0 w-1/4 relative">
-                            <a href="/home/detail/${item.id}">
-                                <video width="100%" height="100%" poster="/upload/${item.poster}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
-                                    <source src="/upload/${item.vidio}" type="video/mp4">
-                                </video>
-                            </a>
-                            <div class="absolute top-0 left-0 m-2">
-                                <i class='bx bxs-bookmark-star text-white text-xl'></i>
-                            </div>
-                            <a href="/home/detail/${item.id}" class="absolute bottom-0 left-0 m-2 play-button">
-                                <div class="play-icon-container play-icon-small">
-                                    <i class="fas fa-play text-white"></i>
+                        <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs">
+                            <div class="flex-shrink-0 w-1/4 relative">
+                                <a href="/home/detail/${item.id}">
+                                    <video width="100%" height="100%" poster="/upload/${item.poster}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                                        <source src="/upload/${item.vidio}" type="video/mp4">
+                                    </video>
+                                </a>
+                                <div class="absolute top-0 left-0 m-2">
+                                    <i class='bx bxs-bookmark-star text-white text-xl'></i>
                                 </div>
-                            </a>
-                            <div class="video-duration font-bold absolute bottom-0 right-0 m-2"></div>
+                                <a href="/home/detail/${item.id}" class="absolute bottom-0 left-0 m-2 play-button">
+                                    <div class="play-icon-container play-icon-small">
+                                        <i class="fas fa-play text-white"></i>
+                                    </div>
+                                </a>
+                                <div class="video-duration font-bold absolute bottom-0 right-0 m-2"></div>
+                            </div>
+                            <div class="flex-1 p-2 flex flex-col justify-center">
+                                <h3 class="text-sm font-semibold text-white truncate">${item.title}</h3>
+                                <p class="text-xs text-white mt-1">${item.deskripsi.substring(0, 50)}...</p>
+                            </div>
                         </div>
-                        <div class="flex-1 p-2 flex flex-col justify-center">
-                            <h3 class="text-sm font-semibold text-white truncate">${item.title}</h3>
-                            <p class="text-xs text-white mt-1">${item.deskripsi.substring(0, 50)}...</p>
-                        </div>
-                    </div>
-                `;
+                    `;
                         });
                     })
                     .catch(error => console.error('Error fetching recommendations:', error));
@@ -1416,68 +1428,27 @@
 
 
 
-
-
-
-
-            //like
-            document.querySelectorAll('.bx-like').forEach((likeIcon, index) => {
-                const likeKey = `like-status-${index}`;
-                const likeCountKey = `like-count-${index}`;
-
-                const liked = localStorage.getItem(likeKey) === 'true';
-                const likeCount = parseInt(localStorage.getItem(likeCountKey), 10) || 0;
-
-                if (liked) {
-                    likeIcon.classList.add('liked');
-                }
-
-                const likeCountElement = document.getElementById(`like-count-${index}`);
-                likeCountElement.textContent = likeCount;
-
-                likeIcon.addEventListener('click', function() {
-                    let currentLikeCount = parseInt(likeCountElement.textContent, 10) || 0;
-
-                    if (likeIcon.classList.contains('liked')) {
-                        likeIcon.classList.remove('liked');
-                        currentLikeCount--;
-                        localStorage.setItem(likeKey, 'false');
-                    } else {
-                        likeIcon.classList.add('liked');
-                        currentLikeCount++;
-                        localStorage.setItem(likeKey, 'true');
-                    }
-
-                    likeCountElement.textContent = currentLikeCount;
-                    localStorage.setItem(likeCountKey, currentLikeCount);
-                });
-            });
-
-
             // Bookmark 
             document.querySelectorAll('.bx-bookmark').forEach((bookmarkButton, index) => {
-                const bookmarkKey = `bookmark-status-${index}`;
-
-                const bookmarked = localStorage.getItem(bookmarkKey) === 'true';
-                if (bookmarked) {
-                    bookmarkButton.classList.add('bxs-bookmark');
-                    bookmarkButton.classList.remove('bx-bookmark');
-                }
-
                 bookmarkButton.addEventListener('click', function() {
-                    const isBookmarked = bookmarkButton.classList.contains('bxs-bookmark');
+                    const trailerId = bookmarkButton.dataset.trailerId; // ID trailer yang akan ditambahkan ke watchlist
 
-                    if (isBookmarked) {
-                        bookmarkButton.classList.remove('bxs-bookmark');
-                        bookmarkButton.classList.add('bx-bookmark');
-                        localStorage.setItem(bookmarkKey, 'false');
-                    } else {
-                        bookmarkButton.classList.add('bxs-bookmark');
-                        bookmarkButton.classList.remove('bx-bookmark');
-                        localStorage.setItem(bookmarkKey, 'true');
-                    }
+                    axios.post(`/watchlist/toggle/${trailerId}`)
+                        .then(response => {
+                            if (response.data.status === 'added') {
+                                bookmarkButton.classList.add('bxs-bookmark');
+                                bookmarkButton.classList.remove('bx-bookmark');
+                            } else {
+                                bookmarkButton.classList.add('bx-bookmark');
+                                bookmarkButton.classList.remove('bxs-bookmark');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
                 });
             });
+
 
             // search
             const searchInput = document.getElementById('search-input');
@@ -1516,19 +1487,7 @@
                 }
             });
 
-            // Event listener untuk menampilkan riwayat saat input pencarian diklik
-            searchInput.addEventListener('focus', function() {
-                if (searchHistory.length > 0) {
-                    searchHistoryContainer.classList.remove('hidden');
-                }
-            });
 
-            // Event listener untuk menyembunyikan riwayat jika klik di luar input pencarian
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchHistoryContainer.contains(e.target)) {
-                    searchHistoryContainer.classList.add('hidden');
-                }
-            });
 
             // Fungsi untuk memperbarui saran pencarian dengan poster kecil
             function updateSuggestions(query) {
@@ -1578,30 +1537,46 @@
                 }
             }
 
-
-
-            // Tambahkan atribut data-poster di elemen trailer
-            // Contoh:
-            // <li data-title="Film Title" data-poster="path/to/poster.jpg"></li>
-
-
-           
-            // Fungsi untuk melakukan pencarian
+            // Fungsi untuk melakukan pencarian dan mengatur scroll halaman
             function performSearch(query) {
-                console.log('Searching for:', query);
+                // Lakukan pencarian di sini (kode pencarian dapat disesuaikan)
+
+                // Contoh logika pencarian sederhana: filter elemen berdasarkan judul
                 const trailers = document.querySelectorAll('li[data-title]');
                 trailers.forEach(function(trailer) {
-                    if (trailer.getAttribute('data-title').toLowerCase().includes(query.toLowerCase())) {
-                        trailer.style.display = 'block';
-                        trailer.classList.add('zoom-in');
+                    const title = trailer.getAttribute('data-title').toLowerCase();
+                    if (title.includes(query.toLowerCase())) {
+                        trailer.classList.remove('hidden'); // Tampilkan trailer yang sesuai
                     } else {
-                        trailer.style.display = 'none';
-                        trailer.classList.remove('zoom-in');
+                        trailer.classList.add('hidden'); // Sembunyikan trailer yang tidak sesuai
                     }
                 });
+
+                // Scroll otomatis ke bagian "Top Onema"
+                const topOnemaSection = document.querySelector('.px-32'); // Elemen yang mengandung "Top Onema"
+                if (topOnemaSection) {
+                    topOnemaSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+
             }
 
+            // Event listener untuk menangani pencarian saat menekan Enter
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const query = this.value;
 
+                    // Simpan pencarian ke dalam riwayat dan tampilkan riwayat
+                    if (query && !searchHistory.includes(query)) {
+                        searchHistory.push(query);
+                        updateSearchHistory();
+                    }
+
+                    performSearch(query); // Panggil fungsi performSearch saat Enter ditekan
+                }
+            });
 
 
             //tambah
@@ -2004,7 +1979,6 @@
             });
         });
     </script>
-
 
 </body>
 

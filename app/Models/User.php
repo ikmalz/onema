@@ -19,7 +19,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'profile',
+        'profile_photo_path',
     ];
 
     /**
@@ -40,4 +40,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function watchlist()
+    {
+        return $this->hasMany(Watchlist::class);
+    }    
 }

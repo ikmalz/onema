@@ -54,15 +54,17 @@ class AuthController extends Controller
         auth()->login($user);
 
         // Redirect ke halaman home
-        return redirect()->route('home');
+        return redirect()->route('login');
     }
 
 
-    
+
     public function logout(Request $request)
     {
         Auth::logout();
 
-        return redirect('home');
+        return redirect()->route('login');
     }
+
+   
 }
