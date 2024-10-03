@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage; // Tambahkan ini
+
 
 class AuthController extends Controller
 {
@@ -66,5 +68,36 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-   
+    public function switchAccount($accountId)
+    {
+        $user = User::find($accountId);
+
+        if ($user) {
+            Auth::login($user);
+            return redirect()->route('home');  // Redirect ke halaman home setelah login
+        }
+
+        return back()->withErrors(['account' => 'Account not found.']);
+    }
+
+    public function updateProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+
+        if ($user->profile_photo_path) {
+            Storage::delete('public/' . $user->profile_photo_path);
+        }
+
+        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+
+        $user->update(['profile_photo_path' => $path]);
+
+
+        return back()->with('success', 'Profile photo updated successfully.');
+    }
 }

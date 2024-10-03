@@ -41,8 +41,5 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function watchlist()
-    {
-        return $this->hasMany(Watchlist::class);
-    }    
+   
 }

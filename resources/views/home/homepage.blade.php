@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Movie Review</title>
+    <link rel="icon" href="../asset/foto/logoonema.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/boxicons/css/boxicons.min.css">
@@ -354,9 +356,7 @@
             color: white;
         }
 
-        .bx-like,
-        .bx-bookmark,
-        .bxs-bookmark {
+        .bx-like {
             transition: color 0.3s ease, transform 0.3s ease;
         }
 
@@ -364,19 +364,6 @@
             color: white;
         }
 
-
-        /* Pastikan ikon bookmark tetap konsisten dalam ukuran dan posisi */
-        .bx-bookmark,
-        .bxs-bookmark {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            line-height: 24px;
-            vertical-align: middle;
-            text-align: center;
-            transition: color 0.3s ease, transform 0.3s ease;
-            /* Transisi halus untuk perubahan */
-        }
 
         .truncate {
             white-space: nowrap;
@@ -593,7 +580,77 @@
         .shadow-custom {
             box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.45);
         }
+
+        /* Mengatur warna icon bookmark menjadi abu-abu secara default */
+        .bx-bookmark {
+            color: gray;
+        }
+
+        /* Mengatur warna icon bookmark menjadi putih penuh saat ada di watchlist (class active-bookmark) */
+        .active-bookmark {
+            color: white;
+        }
+
+
+        .modal {
+            display: none;
+            /* Modal disembunyikan secara default */
+            position: fixed;
+            /* Posisi tetap */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Latar belakang gelap */
+            z-index: 1000;
+            /* Pastikan modal berada di atas konten lainnya */
+            justify-content: center;
+            /* Pusatkan konten */
+            align-items: center;
+            /* Pusatkan konten */
+        }
+
+        .modal.active {
+            display: flex;
+            /* Modal akan muncul ketika class 'active' ditambahkan */
+        }
+
+        .modal-content {
+            width: 300px;
+            /* Lebar modal */
+            margin: 0 auto;
+            /* Pusatkan modal */
+            padding: 20px;
+            /* Padding untuk konten modal */
+            border-radius: 8px;
+            /* Sudut bulat */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            /* Bayangan modal */
+            background-color: white;
+            /* Warna latar belakang modal */
+            transform: scale(1.05);
+            /* Skala awal */
+            opacity: 0;
+            /* Awalnya tidak terlihat */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            /* Transisi */
+        }
+
+        .modal-content.show {
+            transform: scale(1);
+            /* Skala saat muncul */
+            opacity: 1;
+            /* Menjadi terlihat */
+        }
     </style>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
 </head>
 
 <body class="font-poppins">
@@ -643,10 +700,11 @@
                                 <span class="text-white font-semibold text-sm ml-2">Menu</span>
                             </a>
                             <div class="h-6 border-l border-gray-400 mx-2"></div>
-                            <a href="{{ route('watchlist') }}" class="flex items-center">
+                            <a href="{{ route('watchlists') }}" class="flex items-center">
                                 <i class='bx bxs-bookmark-star text-white font-bold' style="font-size: 24px;"></i>
                                 <span class="text-white font-semibold text-sm ml-2">Watchlist</span>
                             </a>
+
 
                         </div>
 
@@ -674,13 +732,14 @@
                         </div>
                         <!-- Menggabungkan username dan profile photo dalam satu kelas -->
                         <div class="profile flex items-center ml-4">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgwzioHdOQKqCkL_KxmDiVgATG4rtrjImg4w&s"
+                            <img src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_path) : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                                 alt="Profile Photo"
                                 class="w-8 h-8 rounded-full">
                             <span id="account-link" class="text-white cursor-pointer font-semibold text-sm ml-2">
                                 {{ optional(Auth::user())->username }}
                             </span>
                         </div>
+
 
                         @endauth
 
@@ -705,11 +764,11 @@
                 </svg>
                 <span class="sr-only">Info</span>
                 <div>
-                    <span class="font-medium">Ensure that these requirements are met:</span>
+                    <span class="font-medium">Persyaratan untuk ulasan film:</span>
                     <ul class="mt-1.5 list-disc list-inside">
-                        <li>At least 10 characters (and up to 100 characters)</li>
-                        <li>At least one lowercase character</li>
-                        <li>Inclusion of at least one special character, e.g., ! @ # ?</li>
+                        <li>Minimal 10 karakter untuk ulasan.</li>
+                        <li>Setidaknya satu karakter huruf kecil.</li>
+                        <li>Termasuk satu karakter khusus, misalnya ! @ # ?</li>
                     </ul>
                 </div>
             </div>
@@ -717,18 +776,18 @@
                 <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                 </svg>
-                <span class="sr-only">Danger</span>
+                <span class="sr-only">Peringatan</span>
                 <div>
-                    <span class="font-medium">Ensure that these requirements are met:</span>
+                    <span class="font-medium">Perhatikan bahwa:</span>
                     <ul class="mt-1.5 list-disc list-inside">
-                        <li>At least 10 characters (and up to 100 characters)</li>
-                        <li>At least one lowercase character</li>
-                        <li>Inclusion of at least one special character, e.g., ! @ # ?</li>
+                        <li>Ulasan yang tidak memenuhi syarat tidak akan dipublikasikan.</li>
+                        <li>Pastikan untuk tidak menggunakan bahasa yang kasar atau tidak pantas.</li>
+                        <li>Ulasan harus relevan dengan film yang diulas.</li>
                     </ul>
                 </div>
             </div>
             <button id="close-info-modal" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                mengerti
+                Mengerti
             </button>
         </div>
     </div>
@@ -831,21 +890,26 @@
     <!--end modal form-->
 
     <!-- Akun -->
-    <div id="akun-popup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center transition-opacity duration-300 opacity-0">
+    <div id="akun-popup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center transition-opacity duration-300 opacity-0">
         <div id="akun-popup-content" class="transform transition-transform duration-300 scale-95 bg-white max-w-md rounded-lg overflow-hidden shadow-lg relative">
-            <button id="close-akun-popup" class="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-900">
+            <button id="close-akun-popup" class="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l6 6m0 0l6 6M7 7l6-6M7 7l-6 6" />
                 </svg>
                 <span class="sr-only">Close</span>
             </button>
+
             <div class="text-center p-6 border-b">
                 <div class="relative w-24 h-24 mx-auto">
                     <!-- Gambar Profil -->
-                    <img class="h-24 w-24 rounded-full mx-auto" src="{{ Auth::user()->profile_photo_url ?? 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="" />
+                    <img class="h-24 w-24 rounded-full mx-auto border-2 border-gray-300 shadow-md"
+                        src="{{ Auth::user()->profile_photo_path 
+                     ? asset('storage/' . Auth::user()->profile_photo_path) 
+                     : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+                        alt="Profile Photo" />
 
-                    <!-- Ikon Tambah -->
-                    <form action="" method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0">
+                    <!-- Ikon Tambah untuk Mengganti Gambar Profil -->
+                    <form action="{{ route('update-profile-photo') }}" method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0">
                         @csrf
                         <label for="profile-photo" class="cursor-pointer">
                             <img class="h-8 w-8 rounded-full border border-gray-200" src="https://img.icons8.com/ios/50/000000/add-image.png" alt="Upload" />
@@ -853,21 +917,47 @@
                         <input type="file" name="profile_photo" id="profile-photo" class="hidden" onchange="this.form.submit()">
                     </form>
                 </div>
-                <p class="pt-2 text-lg font-semibold">{{ optional(Auth::user())->username }}</p>
+
+                <p class="pt-3 text-lg font-semibold">{{ optional(Auth::user())->username }}</p>
                 <p class="text-sm text-gray-600">{{ optional(Auth::user())->email }}</p>
+
+                <!-- Daftar Akun -->
                 <div class="mt-5">
-                    <a href="#" class="border rounded-full py-2 px-4 text-xs font-semibold text-gray-700">Manage your Google Account</a>
+                    <p class="font-semibold">Switch Account:</p>
+                    <ul class="space-y-2">
+                        @foreach($availableAccounts as $account)
+                        <li>
+                            <form action="{{ route('switch-account', $account->id) }}" method="POST">
+                                @csrf
+                                <div class="flex items-center justify-between p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition duration-200">
+                                    <div class="flex items-center">
+                                        <img class="h-8 w-8 rounded-full mr-2"
+                                            src="{{ $account->profile_photo_path 
+                                         ? asset('storage/' . $account->profile_photo_path) 
+                                         : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+                                            alt="Profile Photo" />
+                                        <span class="text-gray-800">{{ $account->username }} ({{ $account->email }})</span>
+                                    </div>
+                                    <button type="submit" class="text-blue-500 font-semibold hover:underline focus:outline-none">
+                                        Switch
+                                    </button>
+                                </div>
+                            </form>
+                        </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
 
             <div class="border-b">
                 <div class="px-6 py-4 text-center">
-                    <a href="#" class="border rounded py-2 px-4 text-xs font-semibold text-gray-70">Sign out of all accounts</a>
+                    <a href="#" class="border rounded py-2 px-4 text-xs font-semibold text-gray-700 hover:bg-gray-200 transition duration-200">Sign out of all accounts</a>
                 </div>
             </div>
+
             <div class="px-6 py-4">
-                <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-gray-600 mr-2">Privacy Policy</span>
-                <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-gray-600 mr-2">Terms of Service</span>
+                <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-gray-600 mr-2 hover:bg-gray-100 transition duration-200">Privacy Policy</span>
+                <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-gray-600 mr-2 hover:bg-gray-100 transition duration-200">Terms of Service</span>
             </div>
         </div>
     </div>
@@ -1032,7 +1122,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <a href="#" id="watchlist-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
                             <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
                             <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
@@ -1040,6 +1130,7 @@
                         <span class="ms-3">Watchlist</span>
                     </a>
                 </li>
+
                 <!-- Label Admin dengan Background Color -->
                 <li>
                     <span class="block px-2 py-1 text-sm font-semibold text-gray-300 dark:text-gray-400 bg-gray-700 rounded">Tambah</span>
@@ -1091,6 +1182,57 @@
         </div>
     </aside>
     <!--end side bar -->
+
+    <!-- Modal Structure -->
+    <div id="watchlistModal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50">
+        <div class="relative p-4 w-full max-w-2xl h-full md:h-auto">
+            <div class="relative bg-white rounded-lg shadow">
+                <div class="flex justify-between items-center p-5 rounded-t border-b">
+                    <h3 class="text-xl font-medium text-gray-900">Your Watchlist</h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-hide="#watchlistModal">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Search input in Modal -->
+                <div class="p-5 border-b">
+                    <input id="modalWatchlistSearch" type="text" placeholder="Search trailer in modal..." class="w-full p-2 border border-gray-300 rounded">
+                </div>
+                <div class="p-6 space-y-6">
+                    <div id="modal-watchlist-content">
+                        <ul id="modalWatchlistItems" class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            @forelse ($watchlistItems as $item)
+                            @if($item->trailer)
+                            <li class="watchlist-item" data-title="{{ strtolower($item->trailer->title) }}">
+                                <a href="{{ route('home.detail', $item->trailer->id) }}" class="group block overflow-hidden">
+                                    <img
+                                        src="{{ asset('upload/' . $item->trailer->poster) }}"
+                                        alt="{{ $item->trailer->title }}"
+                                        class="h-[150px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[150px]" />
+                                    <div class="relative bg-white pt-3">
+                                        <h3 class="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">
+                                            {{ $item->trailer->title }}
+                                        </h3>
+                                    </div>
+                                </a>
+                            </li>
+                            @else
+                            <li>
+                                <p class="text-center text-gray-500">Trailer not found.</p>
+                            </li>
+                            @endif
+                            @empty
+                            <li>
+                                <p class="text-center text-gray-500">Your watchlist is empty.</p>
+                            </li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!--home-->
     <div id="main-content">
@@ -1237,13 +1379,7 @@
                                 <span id="like-count-{{ $loop->index }}">{{ $trailers->likes_count }}</span>
                                 <i class='bx bx-dislike ml-4 mr-2 cursor-pointer' id="dislike-{{ $loop->index }}"></i>
                                 <span id="dislike-count-{{ $loop->index }}">{{ $trailers->dislikes_count }}</span>
-                                @if($trailers->count())
-                                @foreach($trailers as $trailer)
-                                <i class='bx bx-bookmark ml-10 cursor-pointer text-xl' id="bookmark-{{ $loop->index }}" data-trailer-id="{{ $trailer->id }}"></i>
-                                @endforeach
-                                @else
-                                <p>No trailers available</p>
-                                @endif
+                                <i class='bx {{ $watchlistItems->contains($trailers->id) ? "bxs-bookmark-star active-bookmark" : "bx-bookmark" }} ml-10 cursor-pointer text-xl ' id="bookmark-{{ $loop->index }}" data-trailer-id="{{ $trailers->id }}"></i>
                             </div>
                         </div>
                     </li>
@@ -1252,6 +1388,17 @@
             </section>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="notificationModal" class="modal fixed inset-0 flex items-center justify-center hidden">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 scale-95 opacity-0">
+            <span class="close-modal cursor-pointer text-xl font-bold text-gray-700 hover:text-red-500">&times;</span>
+            <p id="modal-message" class="text-black text-center mt-4"></p>
+        </div>
+    </div>
+
+
+
     <!--end home-->
 
     <script>
@@ -1276,6 +1423,58 @@
                     }, 300);
                 });
             }
+
+            //searchwatchlist
+            document.getElementById('modalWatchlistSearch').addEventListener('input', function() {
+                var filter = this.value.toLowerCase();
+                var items = document.querySelectorAll('#modalWatchlistItems .watchlist-item');
+
+                items.forEach(function(item) {
+                    var title = item.getAttribute('data-title');
+                    if (title.includes(filter)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            //modal watchlist
+            document.getElementById('watchlist-link').addEventListener('click', function(event) {
+                event.preventDefault();
+
+                // Buka modal
+                document.getElementById('watchlistModal').classList.remove('hidden');
+
+                // Panggil AJAX untuk mendapatkan data watchlist
+                fetch('/watchlist-data')
+                    .then(response => response.json())
+                    .then(data => {
+                        let watchlistContent = '';
+
+                        if (data.length > 0) {
+                            data.forEach(item => {
+                                watchlistContent += `
+                        <div class="flex space-x-4 items-center mb-4">
+                            <img src="/upload/${item.trailer.poster}" alt="${item.trailer.title}" class="h-16 w-16 object-cover rounded">
+                            <span class="font-medium">${item.trailer.title}</span>
+                        </div>`;
+                            });
+                        } else {
+                            watchlistContent = '<p class="text-center text-gray-500">Your watchlist is empty.</p>';
+                        }
+
+                        document.getElementById('modal-watchlist-content').innerHTML = watchlistContent;
+                    });
+            });
+
+            // Tutup modal
+            document.querySelector('[data-modal-hide]').addEventListener('click', function() {
+                document.getElementById('watchlistModal').classList.add('hidden');
+            });
+
+
+
 
             //recomended movies
             document.getElementById('nextSlide').addEventListener('click', function() {
@@ -1429,28 +1628,66 @@
 
 
             // Bookmark 
-            document.querySelectorAll('.bx-bookmark').forEach((bookmarkButton, index) => {
-                bookmarkButton.addEventListener('click', function() {
-                    const trailerId = bookmarkButton.dataset.trailerId; // ID trailer yang akan ditambahkan ke watchlist
+            $(document).on('click', '.bx-bookmark, .active-bookmark', function() {
+                var $bookmarkIcon = $(this); // Ambil elemen bookmark yang di klik
+                var trailerId = $bookmarkIcon.data('trailer-id'); // Ambil ID trailer dari data attribute
+                console.log('Bookmark icon clicked:', trailerId); // Log saat icon di klik
 
-                    axios.post(`/watchlist/toggle/${trailerId}`)
-                        .then(response => {
-                            if (response.data.status === 'added') {
-                                bookmarkButton.classList.add('bxs-bookmark');
-                                bookmarkButton.classList.remove('bx-bookmark');
-                            } else {
-                                bookmarkButton.classList.add('bx-bookmark');
-                                bookmarkButton.classList.remove('bxs-bookmark');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
+                $.ajax({
+                    url: '/toggle-watchlist/' + trailerId,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        console.log('Response from server:', response); // Log respons server
+                        var message = ''; // Variabel untuk menyimpan pesan
+
+                        if (response.status === 'added') {
+                            $bookmarkIcon.removeClass('bx-bookmark').addClass('active-bookmark');
+                            $bookmarkIcon.css('color', 'white'); // Paksa warna jadi putih
+                            message = 'Trailer ditambahkan ke watchlist.'; // Pesan untuk modal
+                        } else if (response.status === 'removed') {
+                            $bookmarkIcon.removeClass('active-bookmark').addClass('bx-bookmark');
+                            $bookmarkIcon.css('color', 'gray'); // Kembalikan warna jadi abu-abu
+                            message = 'Trailer dihapus dari watchlist.'; // Pesan untuk modal
+                        }
+
+                        // Tampilkan modal dengan pesan
+                        $('#modal-message').text(message);
+                        $('#notificationModal .modal-content').addClass('show'); // Tampilkan modal dengan animasi
+                        $('#notificationModal').removeClass('hidden'); // Tampilkan modal
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error); // Log error di console
+                    }
                 });
             });
 
+            // Menutup modal ketika diklik
+            $(document).on('click', '.close-modal', function() {
+                $('#notificationModal .modal-content').removeClass('show'); // Hapus animasi saat modal ditutup
+                setTimeout(function() {
+                    $('#notificationModal').addClass('hidden'); // Sembunyikan modal setelah animasi selesai
+                }, 300); // Waktu delay harus sama dengan durasi transisi CSS
+            });
 
-            // search
+            // Menutup modal saat klik di luar konten modal
+            $(document).on('click', '#notificationModal', function(event) {
+                if ($(event.target).is('#notificationModal')) {
+                    $('#notificationModal .modal-content').removeClass('show'); // Hapus animasi saat modal ditutup
+                    setTimeout(function() {
+                        $('#notificationModal').addClass('hidden'); // Sembunyikan modal setelah animasi selesai
+                    }, 300); // Waktu delay harus sama dengan durasi transisi CSS
+                }
+            });
+
+
+
+
+
+
+            // Search
             const searchInput = document.getElementById('search-input');
             const suggestions = document.getElementById('suggestions');
             const searchHistoryContainer = document.getElementById('search-history');
@@ -1471,45 +1708,31 @@
                 updateSuggestions(searchQuery);
             });
 
-            // Event listener untuk menangani pencarian saat menekan Enter
-            searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const query = this.value;
-
-                    // Simpan pencarian ke dalam riwayat dan tampilkan riwayat
-                    if (query && !searchHistory.includes(query)) {
-                        searchHistory.push(query);
-                        updateSearchHistory();
-                    }
-
-                    performSearch(query);
-                }
-            });
-
-
-
             // Fungsi untuk memperbarui saran pencarian dengan poster kecil
             function updateSuggestions(query) {
+                // Kosongkan elemen saran sebelum menambahkan yang baru
                 suggestions.innerHTML = '';
 
                 if (query) {
                     suggestions.classList.remove('hidden');
 
                     const trailers = document.querySelectorAll('li[data-title]');
+                    const addedTitles = []; // Array untuk melacak judul yang sudah ditambahkan agar tidak ganda
+
                     trailers.forEach(function(trailer) {
                         const title = trailer.getAttribute('data-title').toLowerCase();
                         const posterUrl = trailer.getAttribute('data-poster'); // Mengambil URL poster dari data-poster
 
-                        if (title.includes(query)) {
+                        if (title.includes(query) && !addedTitles.includes(title)) {
                             const suggestionItem = document.createElement('a');
                             suggestionItem.href = '#';
-                            suggestionItem.className = 'suggestion-item hover:bg-gray-100';
+                            suggestionItem.className = 'suggestion-item hover:bg-gray-100 p-2 block';
 
                             // Tambahkan gambar poster kecil
                             const posterImg = document.createElement('img');
                             posterImg.src = posterUrl;
                             posterImg.alt = 'Poster';
+                            posterImg.className = 'w-10 h-10 mr-2 inline-block'; // Ukuran kecil dan spasi dengan teks
                             suggestionItem.appendChild(posterImg);
 
                             // Tambahkan teks judul
@@ -1525,10 +1748,15 @@
                                 suggestions.classList.add('hidden');
                             });
 
+                            // Tambahkan elemen saran ke dalam suggestions
                             suggestions.appendChild(suggestionItem);
+
+                            // Tambahkan judul ke array untuk menghindari duplikasi
+                            addedTitles.push(title);
                         }
                     });
 
+                    // Jika tidak ada saran yang sesuai, sembunyikan suggestions
                     if (suggestions.innerHTML === '') {
                         suggestions.classList.add('hidden');
                     }
@@ -1559,7 +1787,6 @@
                         behavior: 'smooth'
                     });
                 }
-
             }
 
             // Event listener untuk menangani pencarian saat menekan Enter
@@ -1577,6 +1804,18 @@
                     performSearch(query); // Panggil fungsi performSearch saat Enter ditekan
                 }
             });
+
+            // Fungsi untuk memperbarui riwayat pencarian (tambahkan logika sesuai kebutuhan)
+            function updateSearchHistory() {
+                searchHistoryContainer.innerHTML = '';
+                searchHistory.forEach(function(item) {
+                    const historyItem = document.createElement('div');
+                    historyItem.textContent = item;
+                    searchHistoryContainer.appendChild(historyItem);
+                });
+
+                searchHistoryContainer.classList.remove('hidden');
+            }
 
 
             //tambah

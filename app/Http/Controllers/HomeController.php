@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Trailer;
 use App\Models\Comment; // Tambahkan ini
-use App\Models\CommentLike; // Tambahkan ini jika Anda juga menggunakan model untuk likes
+use App\Models\Dislike;
+use App\Models\LikeComment; // Tambahkan ini jika Anda juga menggunakan model untuk likes
+use App\Models\DislikeComment; // Tambahkan ini jika Anda juga menggunakan model untuk likes
 use App\Models\Reply;
 use App\Models\Watchlist;
+use App\Models\User;
 use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,11 +25,15 @@ class HomeController extends Controller
         $topOnema = Trailer::withCount(['likes', 'dislikes'])
             ->orderBy('populer', 'desc')
             ->get();
-    
-        return view('home.homepage', compact('slider', 'recommendations', 'topOnema'));
-    }
-    
 
+        $watchlistItems = Watchlist::where('user_id', Auth::id())
+            ->with('trailer')
+            ->get();
+
+        $availableAccounts = User::where('id', '!=', Auth::id())->get();
+
+        return view('home.homepage', compact('slider', 'recommendations', 'topOnema', 'watchlistItems', 'availableAccounts'));
+    }
 
 
     public function ikmal()
@@ -46,20 +53,18 @@ class HomeController extends Controller
         ]);
 
         if ($request->hasFile('gridVidio') && $request->hasFile('gridPoster')) {
-            // Mengambil nama asli file video dan poster
+
             $videoName = $request->file('gridVidio')->getClientOriginalName();
             $posterName = $request->file('gridPoster')->getClientOriginalName();
 
-            // Memindahkan file video dan poster ke direktori 'upload'
             $request->file('gridVidio')->move(public_path() . '/upload', $videoName);
             $request->file('gridPoster')->move(public_path() . '/upload', $posterName);
 
-            // Menyimpan data ke dalam database
             DB::table('_trailer')->insert([
                 'title' => $request->input('gridTitle'),
                 'deskripsi' => $request->input('gridDeskripsi'),
-                'vidio' => $videoName, // Menyimpan nama file video ke dalam kolom 'vidio'
-                'poster' => $posterName, // Menyimpan nama file poster ke dalam kolom 'poster'
+                'vidio' => $videoName,
+                'poster' => $posterName,
                 'tahun' => $request->input('gridTahun'),
                 'populer' => $request->input('gridOpsi'),
             ]);
@@ -74,15 +79,12 @@ class HomeController extends Controller
         $video = Trailer::findOrFail($id);
         $user = Auth::user();
 
-        // Cek apakah user sudah like video
         $like = $video->likes()->where('user_id', $user->id)->first();
 
         if ($like) {
-            // Jika sudah like, maka unlike
             $like->delete();
             return response()->json(['status' => 'unliked']);
         } else {
-            // Jika belum like, tambahkan like
             $video->likes()->create([
                 'user_id' => $user->id,
             ]);
@@ -95,15 +97,12 @@ class HomeController extends Controller
         $video = Trailer::findOrFail($id);
         $user = Auth::user();
 
-        // Cek apakah user sudah dislike video
         $dislike = $video->dislikes()->where('user_id', $user->id)->first();
 
         if ($dislike) {
-            // Jika sudah dislike, maka hapus dislike
             $dislike->delete();
             return response()->json(['status' => 'undisliked']);
         } else {
-            // Jika belum dislike, tambahkan dislike
             $video->dislikes()->create([
                 'user_id' => $user->id,
             ]);
@@ -123,7 +122,9 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'Data not found');
         }
 
-        $comments = Comment::where('trailer_id', $id)->with('replies', 'user')->get();
+        $comments = Comment::where('trailer_id', $id)
+            ->with(['replies', 'user', 'likes', 'dislikes'])
+            ->get();
 
         $userHasRated = Rating::where('user_id', auth()->id())
             ->where('trailer_id', $id)
@@ -150,32 +151,67 @@ class HomeController extends Controller
             return response()->json([
                 'comment' => $comment->comment,
                 'created_at' => now()->diffForHumans(),
-                'user_name' => auth()->user()->username // Pastikan username dikirim
+                'user_name' => auth()->user()->username
             ]);
         }
 
         return redirect()->back()->with('success', 'Komentar berhasil ditambahkan.');
     }
 
-    public function likeComment(Request $request, $comment_id)
+    public function likeComment($id)
     {
-        $comment = Comment::findOrFail($comment_id);
+        $comment = Comment::findOrFail($id);
+        $user_id = Auth::id();
 
-        $comment->likes += 1;
-        $comment->save();
+        $existing_like = LikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
+        $existing_dislike = DislikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
 
-        return response()->json(['likes' => $comment->likes]);
+        if ($existing_like) {
+            $existing_like->delete();
+            $like_count = LikeComment::where('comment_id', $id)->count();
+            return response()->json(['status' => 'like removed', 'like_count' => $like_count]);
+        } else {
+            LikeComment::create([
+                'user_id' => $user_id,
+                'comment_id' => $id,
+            ]);
+
+            if ($existing_dislike) {
+                $existing_dislike->delete();
+            }
+
+            $like_count = LikeComment::where('comment_id', $id)->count();
+            return response()->json(['status' => 'liked', 'like_count' => $like_count]);
+        }
     }
 
-    public function dislikeComment(Request $request, $comment_id)
+    public function dislikeComment($id)
     {
-        $comment = Comment::findOrFail($comment_id);
+        $comment = Comment::findOrFail($id);
+        $user_id = Auth::id();
 
-        $comment->dislikes += 1;
-        $comment->save();
+        $existing_dislike = DislikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
+        $existing_like = LikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
 
-        return response()->json(['dislikes' => $comment->dislikes]);
+        if ($existing_dislike) {
+            $existing_dislike->delete();
+            $dislike_count = DislikeComment::where('comment_id', $id)->count();
+            return response()->json(['status' => 'dislike removed', 'dislike_count' => $dislike_count]);
+        } else {
+            DislikeComment::create([
+                'user_id' => $user_id,
+                'comment_id' => $id,
+            ]);
+
+            if ($existing_like) {
+                $existing_like->delete();
+            }
+
+            $dislike_count = DislikeComment::where('comment_id', $id)->count();
+            return response()->json(['status' => 'disliked', 'dislike_count' => $dislike_count]);
+        }
     }
+
 
     public function storeReply(Request $request, Comment $comment)
     {
@@ -258,32 +294,40 @@ class HomeController extends Controller
     public function watchlist()
     {
         $user = Auth::user();
-        $watchlistItems = $user->watchlist()->with('trailer')->get();
-    
-        return view('home.watchlist', compact('watchlistItems'));
-    }
-    
 
-    public function toggleWatchlist(Request $request, $trailerId)
+        $watchlistItems = Watchlist::where('user_id', $user->id)
+            ->with('trailer')
+            ->get();
+
+        return view('home.watchlists', compact('watchlistItems'));
+    }
+
+
+    public function toggleWatchlist($id)
     {
         $user = Auth::user();
+        $watchlistItem = Watchlist::where('user_id', $user->id)->where('trailer_id', $id)->first();
 
-        // Cek apakah trailer sudah ada di watchlist
-        $watchlist = Watchlist::where('user_id', $user->id)
-            ->where('trailer_id', $trailerId)
-            ->first();
-
-        if ($watchlist) {
-            // Jika sudah ada, hapus dari watchlist
-            $watchlist->delete();
+        if ($watchlistItem) {
+            $watchlistItem->delete(); // Hapus dari watchlist jika sudah ada
             return response()->json(['status' => 'removed']);
         } else {
-            // Jika belum ada, tambahkan ke watchlist
             Watchlist::create([
                 'user_id' => $user->id,
-                'trailer_id' => $trailerId,
-            ]);
+                'trailer_id' => $id
+            ]); // Tambahkan ke watchlist jika belum ada
             return response()->json(['status' => 'added']);
         }
+    }
+
+
+
+
+    // WatchlistController.php
+    public function getWatchlistData()
+    {
+        $watchlistItems = Watchlist::with('trailer')->where('user_id', auth()->id())->get();
+
+        return response()->json($watchlistItems);
     }
 }

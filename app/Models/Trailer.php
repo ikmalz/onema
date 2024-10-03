@@ -36,7 +36,6 @@ class Trailer extends Model
         return $this->likes()->where('user_id', auth()->id())->exists();
     }
 
-
     public function isDisliked()
     {
         return $this->dislikes()->where('user_id', auth()->id())->exists();
@@ -47,13 +46,11 @@ class Trailer extends Model
         return $this->hasMany(Rating::class);
     }
 
-
     public function averageRating()
     {
         $ratings = $this->ratings()->avg('rating');
         return $ratings ?: 0; // Jika tidak ada rating, kembalikan 0
     }
-
 
     public function userRating()
     {
@@ -70,8 +67,31 @@ class Trailer extends Model
         return $this->dislikes()->count();
     }
 
-    public function watchlists()
+    // Relasi watchlist many-to-many dengan user
+    public function watchlistUsers()
     {
-        return $this->hasMany(Watchlist::class);
+        return $this->belongsToMany(User::class, 'watchlist', 'trailer_id', 'user_id');
+    }
+
+    // Cek apakah trailer sudah ada di watchlist
+    public function isInWatchlist()
+    {
+        return $this->watchlistUsers()->where('user_id', auth()->id())->exists();
+    }
+
+    // Menambah trailer ke watchlist
+    public function addToWatchlist()
+    {
+        if (!$this->isInWatchlist()) {
+            $this->watchlistUsers()->attach(auth()->id());
+        }
+    }
+
+    // Menghapus trailer dari watchlist
+    public function removeFromWatchlist()
+    {
+        if ($this->isInWatchlist()) {
+            $this->watchlistUsers()->detach(auth()->id());
+        }
     }
 }

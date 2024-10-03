@@ -9,21 +9,25 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('dislikes', function (Blueprint $table) {
+        Schema::create('dislike_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('trailer_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('comment_id');
+            $table->string('username'); 
+            $table->text('comment_text'); 
             $table->timestamps();
         });
+        
     }
+    
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('dislikes');
+        Schema::dropIfExists('dislike_comments');
     }
 };

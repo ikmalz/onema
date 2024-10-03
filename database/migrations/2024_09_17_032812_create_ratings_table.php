@@ -13,17 +13,20 @@ class CreateRatingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('ratings', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('trailer_id');
-            $table->unsignedTinyInteger('rating');
-            $table->timestamps();
+        if (!Schema::hasTable('ratings')) {
+            Schema::create('ratings', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('trailer_id');
+                $table->unsignedTinyInteger('rating');
+                $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('trailer_id')->references('id')->on('trailers')->onDelete('cascade');
-        });
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('trailer_id')->references('id')->on('trailers')->onDelete('cascade');
+            });
+        }
     }
+
 
     /**
      * Reverse the migrations.

@@ -12,10 +12,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('likes', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained()->after('trailer_id'); // Pastikan ini sesuai dengan kolom yang ada
+            $table->foreignId('user_id')->constrained()->after('trailer_id');
         });
     }
-
+    
     public function down()
     {
         Schema::table('likes', function (Blueprint $table) {
@@ -23,4 +23,5 @@ return new class extends Migration
             $table->dropColumn('user_id');
         });
     }
+    
 };

@@ -5,21 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Watchlist extends Model
+class LikeComment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'trailer_id'];
-    protected $table = 'watchlist'; // Ganti dengan nama tabel yang sesuai
+    protected $fillable = ['user_id', 'comment_id',];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function trailer()
+    public function comment()
     {
-        return $this->belongsTo(Trailer::class);
+        return $this->belongsTo(Comment::class);
     }
-    
 }

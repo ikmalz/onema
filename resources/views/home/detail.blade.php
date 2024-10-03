@@ -490,7 +490,9 @@
                 <div class="message flex items-start gap-2.5 mb-4 relative {{ $comment->user_id == auth()->id() ? 'self-user' : 'other-user' }}" data-id="{{ $comment->id }}">
                     @if ($comment->user_id == auth()->id())
                     <!-- Komentar Sendiri -->
-                    <img class="w-8 h-8 rounded-full" src="https://www.shutterstock.com/image-photo/asian-man-wearing-traditional-javanese-260nw-2200692029.jpg" alt="Profile image">
+                    <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_path 
+                            ? asset('storage/' . Auth::user()->profile_photo_path) 
+                            : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
                     <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
                         <div class="flex items-center space-x-2 rtl:space-x-reverse">
                             <span class="text-sm font-semibold">Anda</span>
@@ -499,19 +501,21 @@
                         <p class="text-sm font-light py-1">{{ $comment->comment }}</p>
                         <div class="flex items-center space-x-3 mt-2">
                             <button class="like-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-like text-lg"></i> {{ $comment->likes }}
+                                <i class="bx bx-like text-lg"></i> {{ is_countable($comment->likes) ? $comment->likes->count() : 0 }}
                             </button>
                             <button class="dislike-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-dislike text-lg"></i> {{ $comment->dislikes }}
+                                <i class="bx bx-dislike text-lg"></i> {{ is_countable($comment->dislikes) ? $comment->dislikes->count() : 0 }}
                             </button>
                             <button class="reply-btn" data-id="{{ $comment->id }}">
-                                <div class=" text-sm">Balas</div>
+                                <div class="text-sm">Balas</div>
                             </button>
                         </div>
                     </div>
                     @else
                     <!-- Komentar Orang Lain -->
-                    <img class="w-8 h-8 rounded-full" src="https://www.shutterstock.com/image-photo/asian-man-wearing-traditional-javanese-260nw-2200692029.jpg" alt="Profile image">
+                    <img class="w-8 h-8 rounded-full" src="{{ $comment->user->profile_photo_path 
+                            ? asset('storage/' . $comment->user->profile_photo_path) 
+                            : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
                     <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
                         <div class="flex items-center space-x-2 rtl:space-x-reverse">
                             <span class="text-sm font-light">@ {{ $comment->user->username }}</span>
@@ -520,13 +524,13 @@
                         <p class="text-sm font-normal py-1">{{ $comment->comment }}</p>
                         <div class="flex items-center space-x-3 mt-2">
                             <button class="like-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-like text-lg"></i> {{ $comment->likes }}
+                                <i class="bx bx-like text-lg"></i> {{ is_countable($comment->likes) ? $comment->likes->count() : 0 }}
                             </button>
                             <button class="dislike-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-dislike text-lg"></i> {{ $comment->dislikes }}
+                                <i class="bx bx-dislike text-lg"></i> {{ is_countable($comment->dislikes) ? $comment->dislikes->count() : 0 }}
                             </button>
                             <button class="reply-btn" data-id="{{ $comment->id }}">
-                                <div class=" text-sm">Balas</div>
+                                <div class="text-sm">Balas</div>
                             </button>
                         </div>
                     </div>
@@ -538,7 +542,9 @@
                 <div class="replies p-2 ml-12">
                     @foreach ($comment->replies as $reply)
                     <div class="reply-item flex items-start gap-2.5 p-1 mb-1">
-                        <img class="w-6 h-6 rounded-full" src="https://www.shutterstock.com/image-photo/asian-man-wearing-traditional-javanese-260nw-2200692029.jpg" alt="Profile image">
+                        <img class="w-6 h-6 rounded-full" src="{{ $reply->user->profile_photo_path 
+                            ? asset('storage/' . $reply->user->profile_photo_path) 
+                            : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
                         <div class="flex flex-col text-white">
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm font-semibold text-white">{{ $reply->user->username }}</span>
@@ -566,6 +572,7 @@
                 @endif
             </div>
         </div>
+
     </section>
 
 
@@ -761,43 +768,52 @@
                 });
             });
 
-            $(document).on('click', '.like-btn', function() {
-                let commentId = $(this).data('id');
+            $(document).ready(function() {
+                // Like comment
+                $('.like-btn').click(function() {
+                    let commentId = $(this).data('id');
+                    let url = `/comment/${commentId}/like`;
 
-                $.ajax({
-                    url: '/comment/' + commentId + '/like',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        $('button[data-id="' + commentId + '"].like-btn').html('<i class="bx bx-like"></i> ' + response.likes);
-                        $('button[data-id="' + commentId + '"].dislike-btn').html('<i class="bx bx-dislike"></i> ' + response.dislikes);
-                    },
-                    error: function(xhr) {
-                        console.error('Gagal memberi like:', xhr.statusText);
-                    }
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'liked') {
+                                alert('Comment liked!');
+                            } else if (response.status === 'like removed') {
+                                alert('Like removed!');
+                            }
+                            location.reload(); // Optional: reload the page to update UI
+                        }
+                    });
+                });
+
+                // Dislike comment
+                $('.dislike-btn').click(function() {
+                    let commentId = $(this).data('id');
+                    let url = `/comment/${commentId}/dislike`;
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'disliked') {
+                                alert('Comment disliked!');
+                            } else if (response.status === 'dislike removed') {
+                                alert('Dislike removed!');
+                            }
+                            location.reload(); // Optional: reload the page to update UI
+                        }
+                    });
                 });
             });
 
-            $(document).on('click', '.dislike-btn', function() {
-                let commentId = $(this).data('id');
-
-                $.ajax({
-                    url: '/comment/' + commentId + '/dislike',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        $('button[data-id="' + commentId + '"].dislike-btn').html('<i class="bx bx-dislike"></i> ' + response.dislikes);
-                        $('button[data-id="' + commentId + '"].like-btn').html('<i class="bx bx-like"></i> ' + response.likes);
-                    },
-                    error: function(xhr) {
-                        console.error('Gagal memberi dislike:', xhr.statusText);
-                    }
-                });
-            });
 
 
             // Toggle reply form visibility when 'Balas' button is clicked

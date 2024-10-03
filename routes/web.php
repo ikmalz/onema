@@ -48,8 +48,16 @@ Route::post('/video/{id}/dislike', [HomeController::class, 'dislikeVideo'])->nam
 Route::post('/video/{id}/rate', [HomeController::class, 'rateVideo'])->name('video.rate');
 Route::post('/video/{id}/delete-rating', [HomeController::class, 'deleteRating'])->name('video.delete-rating');
 
-Route::get('/watchlist', [HomeController::class, 'watchlist'])->name('watchlist');
+Route::get('/watchlist', [HomeController::class, 'watchlist'])->name('watchlists');
+Route::post('/toggle-watchlist/{trailerId}', [HomeController::class, 'toggleWatchlist'])->name('toggle-watchlist');
 Route::post('/watchlist/toggle/{id}', [HomeController::class, 'toggleWatchlist'])->name('watchlist.toggle');
+Route::post('/toggle-watchlist/{id}', [HomeController::class, 'toggleWatchlist']);
+
+Route::post('/switch-account/{accountId}', [AuthController::class, 'switchAccount'])->name('switch-account');
+Route::post('/update-profile-photo', [AuthController::class, 'updateProfilePhoto'])->name('update-profile-photo');
+
+
+
 
 
 
