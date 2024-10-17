@@ -20,15 +20,24 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('home');
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'Akun tidak ditemukan.',
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors([
+                'password' => 'Password salah.',
+            ]);
+        }
+
+        $request->session()->regenerate();
+        return redirect()->intended('home');
     }
+
 
     public function showRegistrationForm()
     {
@@ -65,7 +74,7 @@ class AuthController extends Controller
     {
         Auth::logout();
 
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 
     public function switchAccount($accountId)
@@ -74,7 +83,7 @@ class AuthController extends Controller
 
         if ($user) {
             Auth::login($user);
-            return redirect()->route('home');  // Redirect ke halaman home setelah login
+            return redirect()->route('home');
         }
 
         return back()->withErrors(['account' => 'Account not found.']);
@@ -97,7 +106,19 @@ class AuthController extends Controller
 
         $user->update(['profile_photo_path' => $path]);
 
-
         return back()->with('success', 'Profile photo updated successfully.');
+    }
+
+    public function deleteProfilePhoto()
+    {
+        $user = Auth::user();
+
+        if ($user->profile_photo_path) {
+            Storage::delete('public/' . $user->profile_photo_path);
+
+            $user->update(['profile_photo_path' => null]);
+        }
+
+        return back()->with('success', 'Foto profil berhasil dihapus.');
     }
 }

@@ -18,7 +18,8 @@ class Trailer extends Model
         'poster',
         'vidio',
         'tahun',
-        'populer'
+        'populer',
+        'thumbnail'
     ];
 
     public function likes()
@@ -67,31 +68,8 @@ class Trailer extends Model
         return $this->dislikes()->count();
     }
 
-    // Relasi watchlist many-to-many dengan user
-    public function watchlistUsers()
+    public function watchlists()
     {
-        return $this->belongsToMany(User::class, 'watchlist', 'trailer_id', 'user_id');
-    }
-
-    // Cek apakah trailer sudah ada di watchlist
-    public function isInWatchlist()
-    {
-        return $this->watchlistUsers()->where('user_id', auth()->id())->exists();
-    }
-
-    // Menambah trailer ke watchlist
-    public function addToWatchlist()
-    {
-        if (!$this->isInWatchlist()) {
-            $this->watchlistUsers()->attach(auth()->id());
-        }
-    }
-
-    // Menghapus trailer dari watchlist
-    public function removeFromWatchlist()
-    {
-        if ($this->isInWatchlist()) {
-            $this->watchlistUsers()->detach(auth()->id());
-        }
+        return $this->hasMany(Watchlist::class);
     }
 }

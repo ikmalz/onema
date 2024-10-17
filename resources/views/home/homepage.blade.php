@@ -113,31 +113,25 @@
         .bg-black.bg-opacity-75.p-2 {
             background-color: rgba(0, 0, 0, 0.75);
             padding: 0.5rem;
-            border-bottom-left-radius: 1rem;
-            border-bottom-right-radius: 1rem;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
         }
 
         #popup-overlay {
-            visibility: hidden;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+            transform: translateY(-100%);
+            transition: transform 0.5s ease;
+            z-index: 1999;
         }
 
         #popup-overlay.active {
-            visibility: visible;
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(0);
         }
 
-        /* Animasi keluar */
         #popup-overlay.closing {
-            visibility: visible;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+            transform: translateY(-100%);
         }
+
+
 
         #loginModal {
             display: none;
@@ -452,8 +446,6 @@
             background-color: #f0f0f0;
         }
 
-        /* Animasi untuk memperbesar video yang ditemukan */
-        /* Animasi zoom-in */
         @keyframes zoomIn {
             from {
                 transform: scale(0.9);
@@ -471,16 +463,13 @@
         }
 
 
-        /* Animasi untuk transisi latar belakang */
         @keyframes backgroundTransition {
             from {
                 background-color: rgba(255, 255, 0, 0.3);
-                /* Warna latar belakang awal (kuning transparan) */
             }
 
             to {
                 background-color: transparent;
-                /* Latar belakang transparan setelah animasi */
             }
         }
 
@@ -490,51 +479,119 @@
 
         .transition-transform {
             transition: transform 0.3s ease-in-out;
-            /* waktu animasi dipercepat */
         }
 
-        .slider-container {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .slider-item {
-            min-width: 100%;
-            transition: transform 0.5s ease;
-        }
-
-        .slider {
+        .play-button1 {
             position: relative;
-            overflow: hidden;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 1;
+            transition: transform 0.3s ease;
+        }
+
+
+        .text-content {
+            position: absolute;
+            bottom: 0%;
+            left: 25%;
+            opacity: 1;
+            transition: opacity 0.3s ease, transform 0.5s ease-in-out;
+        }
+
+        .slide:hover .play-button {
+            transform: scale(1.1);
+        }
+
+        .slide video {
+            transition: filter 0.3s ease-in-out;
+            width: 100%;
+            height: auto;
+        }
+
+        .slide:hover video {
+            filter: brightness(0.4);
+        }
+
+        .slide:hover .text-content {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .slide::before {
+            content: "";
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.5s ease;
+            transform: translateY(-100%);
+            z-index: 2;
+        }
+
+        .slide:hover::before {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        .slide:hover .text-content-center {
+            opacity: 1;
+            transform: translate(-50%, -50%);
         }
 
         .slides {
             display: flex;
-            transition: transform 0.5s ease-in-out;
+            transition: transform 0.5s ease;
+            gap: 0;
         }
 
         .slide {
-            min-width: 100%;
-            box-sizing: border-box;
+            width: 100%;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .text-content-center {
+            position: absolute;
+            top: -20%;
+            left: 55%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            color: white;
+            text-align: left;
+            transition: opacity 0.5s ease, transform 0.3s ease;
+        }
+
+        .play-button-container {
+            position: absolute;
+            bottom: 10%;
+            left: 95%;
         }
 
         .controls {
             position: absolute;
-            top: 40%;
+            top: 45%;
+            transform: translateY(-50%);
             width: 100%;
             display: flex;
             justify-content: space-between;
-            transform: translateY(-50%);
+            pointer-events: none;
         }
 
         .control-button {
             background: rgba(0, 0, 0, 0.5);
             color: white;
-            border: none;
             padding: 10px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: transform 0.5s ease;
+            transition: background 0.3s ease;
+            pointer-events: auto;
+            border-radius: 5px 5px 5px 5px;
         }
 
         .control-button:active {
@@ -563,7 +620,6 @@
 
         .play-icon-small i {
             font-size: 12px;
-            /* Ukuran ikon lebih kecil */
         }
 
         @layer utilities {
@@ -581,67 +637,80 @@
             box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.45);
         }
 
-        /* Mengatur warna icon bookmark menjadi abu-abu secara default */
-        .bx-bookmark {
-            color: gray;
-        }
-
-        /* Mengatur warna icon bookmark menjadi putih penuh saat ada di watchlist (class active-bookmark) */
-        .active-bookmark {
-            color: white;
-        }
-
-
         .modal {
             display: none;
-            /* Modal disembunyikan secara default */
             position: fixed;
-            /* Posisi tetap */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* Latar belakang gelap */
             z-index: 1000;
-            /* Pastikan modal berada di atas konten lainnya */
             justify-content: center;
-            /* Pusatkan konten */
             align-items: center;
-            /* Pusatkan konten */
         }
 
         .modal.active {
             display: flex;
-            /* Modal akan muncul ketika class 'active' ditambahkan */
         }
 
         .modal-content {
             width: 300px;
-            /* Lebar modal */
             margin: 0 auto;
-            /* Pusatkan modal */
             padding: 20px;
-            /* Padding untuk konten modal */
             border-radius: 8px;
-            /* Sudut bulat */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            /* Bayangan modal */
             background-color: white;
-            /* Warna latar belakang modal */
             transform: scale(1.05);
-            /* Skala awal */
             opacity: 0;
-            /* Awalnya tidak terlihat */
             transition: transform 0.3s ease, opacity 0.3s ease;
-            /* Transisi */
         }
 
         .modal-content.show {
             transform: scale(1);
-            /* Skala saat muncul */
             opacity: 1;
-            /* Menjadi terlihat */
+        }
+
+        .bookmark-icon {
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.3s ease;
+        }
+
+        .bookmark-icon.active {
+            color: rgba(255, 255, 255, 1);
+        }
+
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes modalFadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        .modal-show {
+            animation: modalFadeIn 0.3s forwards;
+        }
+
+        .modal-hide {
+            animation: modalFadeOut 0.3s forwards;
         }
     </style>
     <script>
@@ -695,15 +764,16 @@
                         </div>
 
                         <div class="flex items-center ml-4">
-                            <a id="menu-link" href="#" class="flex items-center">
+                            <a id="menu-link" href="#" class="flex items-center transition duration-150 ease-in-out inset-0 hover:bg-black bg-opacity-10 hover:bg-opacity-10 hover:shadow-md rounded-md p-1">
                                 <i class='bx bx-menu text-black font-bold' style="font-size: 30px;"></i>
                                 <span class="text-white font-semibold text-sm ml-2">Menu</span>
                             </a>
                             <div class="h-6 border-l border-gray-400 mx-2"></div>
-                            <a href="{{ route('watchlists') }}" class="flex items-center">
+                            <a href="{{ route('watchlists') }}" class="flex items-center transition duration-150 ease-in-out inset-0 hover:bg-black bg-opacity-10 hover:bg-opacity-10 hover:shadow-md rounded-md p-1yyy">
                                 <i class='bx bxs-bookmark-star text-white font-bold' style="font-size: 24px;"></i>
                                 <span class="text-white font-semibold text-sm ml-2">Watchlist</span>
                             </a>
+
 
 
                         </div>
@@ -720,6 +790,7 @@
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 Logout
                             </a>
+
                             @endguest
                         </div>
 
@@ -757,7 +828,7 @@
 
     <!--info -->
     <div id="info-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-4xl"> <!-- Ubah max-w-lg menjadi max-w-4xl -->
             <div class="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
                 <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
@@ -786,25 +857,38 @@
                     </ul>
                 </div>
             </div>
-            <button id="close-info-modal" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+
+            <!-- Bagian Ulasan Film -->
+            <div class="mt-4 text-justify">
+                <h3 class="text-lg font-bold text-red-500">Ulasan Film</h3>
+                <p class="mt-2 text-gray-400">
+                Tolong luangkan waktu sejenak untuk memberikan rating yang jujur dan konstruktif setelah menonton video trailer ini, karena setiap pendapat Anda sangat berarti dan dapat membantu pengguna lain dalam menentukan pilihan yang tepat sesuai dengan preferensi mereka. Dengan memberikan penilaian yang sesuai,
+                Anda berperan dalam menciptakan lingkungan yang informatif dan membantu orang lain menemukan konten yang benar-benar mereka nikmati, sehingga pengalaman menonton menjadi lebih menyenangkan dan bermanfaat."                </p>
+                <p class="mt-2 text-gray-400">
+                "Selain itu, kami sangat menghargai partisipasi Anda dalam komunitas kami, karena setiap rating tidak hanya mempengaruhi konten yang ditampilkan, tetapi juga memberikan masukan berharga bagi kami untuk terus meningkatkan kualitas layanan yang kami tawarkan.
+                Dengan berbagi pendapat dan pengalaman Anda, Anda turut berkontribusi dalam pengembangan platform ini, menjadikannya tempat yang lebih baik bagi semua pengguna yang mencari informasi dan hiburan yang berkualitas."
+                </p>
+            </div>
+
+            <button id="close-info-modal" class="mt-4 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Mengerti
             </button>
         </div>
     </div>
     <!--end info -->
 
+
     <!-- Modal Tambah form -->
-    <div id="popup-form-overlay" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
+    <div id="popup-form-overlay" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center" style="z-index: 1999;">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-[40%] max-h-[70%] w-full mx-4 relative overflow-y-auto">
             <button id="close-popup-form" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
-
             <p class="text-gray-800 text-lg font-bold mb-4">Masukkan video</p>
-            <form class="w-full max-w-lg" action="{{ route('form.action') }}" method="post" enctype="multipart/form-data">
+            <form class="w-full" action="{{ route('form.action') }}" method="post" enctype="multipart/form-data">
                 @csrf
                 <!-- Judul Film -->
                 <div class="flex flex-wrap -mx-3 mb-6">
@@ -816,6 +900,7 @@
                         <p class="text-gray-600 text-xs italic">Masukkan judul film</p>
                     </div>
                 </div>
+
                 <!-- Deskripsi Video -->
                 <div class="flex flex-wrap -mx-3 mb-6">
                     <div class="w-full px-3">
@@ -826,6 +911,7 @@
                         <p class="text-gray-600 text-xs italic">Masukkan deskripsi singkat tentang video</p>
                     </div>
                 </div>
+
                 <!-- Unggah Video -->
                 <div class="flex flex-wrap -mx-3 mb-6">
                     <div class="w-full px-3 mb-6 md:mb-0">
@@ -836,17 +922,31 @@
                         <p class="text-gray-600 text-xs italic">Pilih file video untuk diunggah</p>
                     </div>
                 </div>
+
                 <!-- Unggah Poster/Thumbnail -->
                 <div class="flex flex-wrap -mx-3 mb-6">
                     <div class="w-full px-3 mb-6 md:mb-0">
                         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="poster-upload">
-                            Unggah Poster/Thumbnail
+                            Unggah Poster
                         </label>
                         <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="poster-upload" type="file" accept="image/*" name="gridPoster">
                         <p class="text-gray-600 text-xs italic">Pilih file gambar untuk poster atau thumbnail</p>
                     </div>
                 </div>
-                <!-- Tahun Rilis, Popularitas, dan Tombol Kirim -->
+
+                <!-- Unggah Thumbnail -->
+                <div class="flex flex-wrap -mx-3 mb-6">
+                    <div class="w-full px-3 mb-6 md:mb-0">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="thumbnail-upload">
+                            Unggah Thumbnail
+                        </label>
+                        <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="thumbnail-upload" type="file" accept="image/*" name="gridThumbnail">
+                        <p class="text-gray-600 text-xs italic">Pilih file gambar untuk thumbnail</p>
+                    </div>
+                </div>
+
+
+                <!-- Tahun Rilis, Genre, dan Tombol Kirim -->
                 <div class="flex flex-wrap -mx-3 mb-6">
                     <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-release-year">
@@ -903,12 +1003,13 @@
                 <div class="relative w-24 h-24 mx-auto">
                     <!-- Gambar Profil -->
                     <img class="h-24 w-24 rounded-full mx-auto border-2 border-gray-300 shadow-md"
-                        src="{{ Auth::user()->profile_photo_path 
-                     ? asset('storage/' . Auth::user()->profile_photo_path) 
-                     : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+                        src="{{ Auth::check() && Auth::user()->profile_photo_path 
+                 ? asset('storage/' . Auth::user()->profile_photo_path) 
+                 : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                         alt="Profile Photo" />
 
                     <!-- Ikon Tambah untuk Mengganti Gambar Profil -->
+                    @if(Auth::check())
                     <form action="{{ route('update-profile-photo') }}" method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0">
                         @csrf
                         <label for="profile-photo" class="cursor-pointer">
@@ -916,10 +1017,44 @@
                         </label>
                         <input type="file" name="profile_photo" id="profile-photo" class="hidden" onchange="this.form.submit()">
                     </form>
+                    @endif
                 </div>
 
-                <p class="pt-3 text-lg font-semibold">{{ optional(Auth::user())->username }}</p>
-                <p class="text-sm text-gray-600">{{ optional(Auth::user())->email }}</p>
+                @if(Auth::check())
+                <p class="pt-3 text-lg font-semibold">{{ Auth::user()->username }}</p>
+                <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
+
+                <!-- Tombol Hapus Foto Profil -->
+                @if(Auth::user()->profile_photo_path)
+                <form action="{{ route('delete-profile-photo') }}" method="POST" class="mt-4">
+                    @csrf
+                    <button type="submit" class="bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200">
+                        Hapus Foto Profil
+                    </button>
+                </form>
+                @endif
+                @else
+                <p class="pt-3 text-lg font-semibold">Guest</p>
+                <p class="text-sm text-gray-600">Please log in to see your account details.</p>
+                @endif
+
+
+                <!-- Menampilkan pesan sukses atau error -->
+                @if(session('success'))
+                <div class="mt-4 p-2 text-sm text-green-700 bg-green-100 border border-green-400 rounded">
+                    {{ session('success') }}
+                </div>
+                @endif
+
+                @if($errors->any())
+                <div class="mt-4 p-2 text-sm text-red-700 bg-red-100 border border-red-400 rounded">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
 
                 <!-- Daftar Akun -->
                 <div class="mt-5">
@@ -933,8 +1068,8 @@
                                     <div class="flex items-center">
                                         <img class="h-8 w-8 rounded-full mr-2"
                                             src="{{ $account->profile_photo_path 
-                                         ? asset('storage/' . $account->profile_photo_path) 
-                                         : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+                                                 ? asset('storage/' . $account->profile_photo_path) 
+                                                 : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                                             alt="Profile Photo" />
                                         <span class="text-gray-800">{{ $account->username }} ({{ $account->email }})</span>
                                     </div>
@@ -951,7 +1086,11 @@
 
             <div class="border-b">
                 <div class="px-6 py-4 text-center">
+                    @if(Auth::check())
                     <a href="#" class="border rounded py-2 px-4 text-xs font-semibold text-gray-700 hover:bg-gray-200 transition duration-200">Sign out of all accounts</a>
+                    @else
+                    <a href="{{ route('login') }}" class="border rounded py-2 px-4 text-xs font-semibold text-gray-700 hover:bg-gray-200 transition duration-200">Login to Manage Accounts</a>
+                    @endif
                 </div>
             </div>
 
@@ -963,7 +1102,8 @@
     </div>
     <!-- end Akun -->
 
-    <!-- setting -->
+
+    <!-- Modal Settings -->
     <div id="settings-modal" class="fixed inset-0 hidden z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
         <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800 p-4 max-w-lg w-full">
             <div class="flex justify-between items-center pb-2 border-b">
@@ -979,8 +1119,8 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 dark:text-gray-300 mb-2">Pilih Bahasa:</label>
                     <select id="language-select" class="w-full p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                        <option value="indo">Bahasa Indonesia</option>
-                        <option value="english">English</option>
+                        <option value="id" {{ app()->getLocale() == 'id' ? 'selected' : '' }}>Bahasa Indonesia</option>
+                        <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>English</option>
                     </select>
                 </div>
                 <!-- Theme Selection -->
@@ -997,51 +1137,20 @@
             </div>
         </div>
     </div>
+
     <!-- end setting -->
 
-    <!--modal login-->
-    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-900 mx-auto pb-10">Sign in to your account</h2>
-                <button id="closeModal" class="text-gray-600 hover:text-gray-900">&times;</button>
-            </div>
-            <form class="space-y-6" action="{{ route('login') }}" method="POST">
-                @csrf
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-900">Username</label>
-                    <input id="username" name="username" type="text" required class="block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500" placeholder="your_username">
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-900">Email address</label>
-                    <input id="email" name="email" type="email" required class="block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500" placeholder="you@example.com">
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-900">Password</label>
-                    <input id="password" name="password" type="password" required class="block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500" placeholder="********">
-                </div>
-                <div>
-                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Sign In</button>
-                </div>
-            </form>
-            <p class="mt-4 text-center text-sm text-gray-600">
-                belum ada akun? <a href="#" class="text-indigo-600 hover:text-indigo-500">daftar disini!!!</a>
-            </p>
-        </div>
-    </div>
-    <!--end modal login-->
-
     <!---pop up-->
-    <div id="popup-overlay" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center z-50">
-        <div class="bg-[#363434] p-8 rounded-lg max-w-4xl w-full h-[650px] relative flex flex-col">
+    <div id="popup-overlay" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center z-50 overflow-hidden">
+        <div class="bg-[#363434] p-8 rounded-lg w-full h-full relative flex flex-col">
             <i id="close-popup" class='bx bx-x absolute top-4 right-4 cursor-pointer text-white bg-red-500 rounded-full p-2 w-10 h-10 flex items-center justify-center'></i>
-            <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+            <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full overflow-auto">
                 <div class="flex justify-center items-center p-2">
                     <img src="../asset/foto/logo_onema-removebg(1).png" alt="" class="w-64 h-64 object-cover">
                 </div>
                 <div class="flex flex-col justify-between p-4">
                     <div class="flex flex-col space-y-4">
-                        <div class="flex space-x-4 mt-56">
+                        <div class="flex space-x-4 mt-80">
                             <i class='bx bx-film text-red-500 text-3xl'></i>
                             <div>
                                 <h3 class="text-lg font-bold text-gray-300 pb-5">Movie Review</h3>
@@ -1065,7 +1174,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col justify-between p-4 -mt-20">
+                <div class="flex flex-col justify-between p-4 -mt-25">
                     <div class="flex space-x-4">
                         <i class='bx bx-film text-red-500 text-3xl'></i>
                         <div>
@@ -1164,7 +1273,7 @@
                     </a>
                 </li>
             </ul>
-            <div id="dropdown-cta" class="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-blue-900" role="alert">
+            <div id="dropdown-cta" class="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-red-900" role="alert">
                 <div class="flex items-center mb-3">
                     <span class="bg-orange-100 text-orange-800 text-sm font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-orange-200 dark:text-orange-900">Info Penting</span>
                     <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-blue-50 inline-flex justify-center items-center w-6 h-6 text-blue-900 rounded-lg focus:ring-2 focus:ring-blue-400 p-1 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800" data-dismiss-target="#dropdown-cta" aria-label="Close">
@@ -1174,7 +1283,7 @@
                         </svg>
                     </button>
                 </div>
-                <p class="mb-3 text-sm text-blue-800 dark:text-blue-400">
+                <p class="mb-3 text-sm text-gray-800 dark:text-gray-400">
                     Preview the new Flowbite dashboard navigation! You can turn the new navigation off for a limited time in your profile.
                 </p>
                 <a class="text-sm text-blue-800 underline font-medium hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" href="#">Turn new navigation off</a>
@@ -1189,27 +1298,30 @@
             <div class="relative bg-white rounded-lg shadow">
                 <div class="flex justify-between items-center p-5 rounded-t border-b">
                     <h3 class="text-xl font-medium text-gray-900">Your Watchlist</h3>
-                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-hide="#watchlistModal">
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-hide="watchlistModal">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                         </svg>
                     </button>
                 </div>
-                <!-- Search input in Modal -->
                 <div class="p-5 border-b">
                     <input id="modalWatchlistSearch" type="text" placeholder="Search trailer in modal..." class="w-full p-2 border border-gray-300 rounded">
                 </div>
                 <div class="p-6 space-y-6">
                     <div id="modal-watchlist-content">
                         <ul id="modalWatchlistItems" class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            @php
+                            $hasTrailer = false;
+                            @endphp
+
                             @forelse ($watchlistItems as $item)
                             @if($item->trailer)
+                            @php
+                            $hasTrailer = true;
+                            @endphp
                             <li class="watchlist-item" data-title="{{ strtolower($item->trailer->title) }}">
                                 <a href="{{ route('home.detail', $item->trailer->id) }}" class="group block overflow-hidden">
-                                    <img
-                                        src="{{ asset('upload/' . $item->trailer->poster) }}"
-                                        alt="{{ $item->trailer->title }}"
-                                        class="h-[150px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[150px]" />
+                                    <img src="{{ asset('upload/' . $item->trailer->poster) }}" alt="{{ $item->trailer->title }}" class="h-[150px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[150px]" />
                                     <div class="relative bg-white pt-3">
                                         <h3 class="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">
                                             {{ $item->trailer->title }}
@@ -1217,17 +1329,20 @@
                                     </div>
                                 </a>
                             </li>
-                            @else
-                            <li>
-                                <p class="text-center text-gray-500">Trailer not found.</p>
-                            </li>
                             @endif
                             @empty
                             <li>
                                 <p class="text-center text-gray-500">Your watchlist is empty.</p>
                             </li>
                             @endforelse
+
+                            @if (!$hasTrailer)
+                            <li>
+                                <p class="text-center text-gray-500">Trailer not found.</p>
+                            </li>
+                            @endif
                         </ul>
+
                     </div>
                 </div>
             </div>
@@ -1241,23 +1356,22 @@
             <!-- Slider Section -->
             <div class="flex flex-col lg:flex-row my-8 px-4 lg:px-32">
                 <!-- Slider -->
-                <div class="relative w-full lg:w-3/4 lg:mr-16 h-[500px]">
+                <div class="relative w-full lg:w-3/4 lg:mr-16 h-[500px] cursor-pointer overflow-hidden">
                     <div class="slider h-full">
                         <div class="slides h-full flex">
                             @foreach ($slider as $item)
                             <div class="slide relative h-full flex-shrink-0 w-full">
-
                                 <a href="{{ route('home.detail', $item->id) }}">
-                                    <img src="{{ asset('upload/' . $item->poster) }}" alt="Background Poster" class="w-full h-full object-cover rounded-lg shadow-lg mask-gradient" />
+                                    <video poster="{{ asset('upload/' . $item->thumbnail) }}" class="w-full h-full object-cover rounded-lg shadow-lg mask-gradient" style="image-rendering: crisp-edges;">
+                                        <source src="{{ asset('upload/' . $item->vidio) }}" type="video/mp4">
+                                    </video>
                                 </a>
 
                                 <div class="absolute bottom-10 left-0 w-full flex items-center px-8">
-
                                     <div class="poster-container h-[200px] w-[140px] flex-shrink-0 mr-6 relative">
                                         <a href="{{ route('home.detail', $item->id) }}">
-                                            <img src="{{ asset('upload/' . $item->poster) }}" alt="Poster" class="w-full h-full object-cover rounded-lg shadow-lg" />
-                                        </a>
-                                        <div class="absolute -top-1 -left-1">
+                                            <img src="{{ asset('upload/' . $item->poster) }}" alt="Poster" class="w-full h-full object-cover rounded-md shadow-lg" /> </a>
+                                        <div class="absolute -top-1" style="left: -0.45rem;">
                                             <div class="relative">
                                                 <i class='bx bxs-bookmark text-gray-500 text-4xl'></i>
                                                 <i class='bx bx-plus absolute top-1 text-white text-2xl' style="left: 5px;"></i>
@@ -1265,25 +1379,32 @@
                                         </div>
                                     </div>
 
-                                    <div class="text-content flex items-center mt-8">
-
-                                        <button class="play-button bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center mr-4">
-                                            <i class='bx bx-play text-2xl'></i>
-                                        </button>
+                                    <div class="text-content flex items-center">
+                                        <a href="{{ route('home.detail', $item->id) }}">
+                                            <button class="play-button bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center mr-4 ">
+                                                <i class='bx bx-play text-2xl'></i>
+                                            </button>
+                                        </a>
 
                                         <div class="info-content flex flex-col">
-                                            <h2 class="text-4xl font-extrabold text-slate-800 mb-2 text-shadow-md">{{ $item->title }}</h2>
+                                            <h2 class="text-4xl font-extrabold text-slate-900 mb-2 text-shadow-md">{{ $item->title }}</h2>
                                             <p class="text-base text-black mb-4 text-shadow-md">{{ Str::limit($item->deskripsi, 30, '...') }}</p>
-                                            <div class="video-duration text-slate-600 font-bold" id="duration-{{ $loop->index }}"></div>
-                                            <div class="video-controls hidden">
-                                                <div class="video-controls-icon">
-                                                    <i class='bx bx-dots-horizontal-rounded text-white text-2xl'></i>
-                                                </div>
-                                                <div class="current-time text-black font-bold" id="current-time-{{ $loop->index }}"></div>
-                                            </div>
-                                            <div class="current-time text-black font-bold" id="current-time-{{ $loop->index }}"></div>
+                                            <div class="video-duration text-slate-600 font-bold" id="slider-duration-{{ $loop->index }}"></div>
                                         </div>
                                     </div>
+
+                                    <div class="text-content-center">
+                                        <a href="{{ route('home.detail', $item->id) }}">
+                                            <button class="play-button1 bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center top-14 -left-20 transform transition-transform duration-300 hover:scale-125">
+                                                <i class='bx bx-play text-2xl'></i>
+                                            </button>
+
+                                        </a>
+                                        <h2 class="text-4xl font-extrabold">{{ $item->title }}</h2>
+                                        <p>{{ Str::limit($item->deskripsi, 30, '...') }}</p>
+                                    </div>
+
+
                                 </div>
                             </div>
                             @endforeach
@@ -1296,64 +1417,74 @@
                 </div>
 
 
+
                 <!-- Recommendations Section -->
-                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8">
-                    <h1 class="text-black text-xl font-bold px-4 py-2 rounded-r-lg">
-                        <span class="border-l-4 border-black pl-2">Recommended Movies</span>
+                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8 bg-black bg-opacity-75 rounded-lg p-4 shadow-black">
+                    <h1 class="text-black text-xl font-bold mb-4 px-4 py-2 rounded-lg">
+                        <span class="border-l-4 border-red-600 pl-2 text-white">{{ __('Recommended Movies') }}</span>
                     </h1>
+
                     <section class="flex flex-col space-y-4 mt-4">
                         @foreach ($recommendations as $recommendation)
-                        <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs shadow-custom">
+                        <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs shadow-custom relative">
                             <!-- Video Thumbnail -->
-                            <div class="flex-shrink-0 w-1/4 relative">
+                            <div class="flex-shrink-0 w-1/4">
                                 <a href="{{ route('home.detail', $recommendation->id) }}">
                                     <video width="100%" height="100%" poster="{{ asset('upload/' . $recommendation->poster) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                                         <source src="{{ asset('upload/' . $recommendation->vidio) }}" type="video/mp4">
                                     </video>
                                 </a>
-                                <div class="absolute top-0 left-0 m-2">
-                                    <i class='bx bxs-bookmark-star text-white text-xl'></i>
-                                </div>
-                                <a href="{{ route('home.detail', $recommendation->id) }}" class="absolute bottom-0 left-0 m-2 play-button">
-                                    <div class="play-icon-container play-icon-small">
-                                        <i class="fas fa-play text-white"></i>
-                                    </div>
-                                </a>
-                                <div class="video-duration font-bold absolute bottom-0 right-0 m-2"></div>
                             </div>
+
                             <!-- Title and Description -->
                             <div class="flex-1 p-2 flex flex-col justify-center">
-                                <h3 class="text-sm font-semibold text-white truncate">{{ $recommendation->title }}</h3>
+                                <!-- Icon Play & Video Duration -->
+                                <div class="flex items-center justify-start mb-2">
+                                    <a href="{{ route('home.detail', $recommendation->id) }}" class="play-button flex items-center mr-1">
+                                        <div class="play-icon-container play-icon-small">
+                                            <i class="fas fa-play text-white text-lg"></i>
+                                        </div>
+                                    </a>
+                                    <div class="video-duration font-bold text-white px-2 py-1 rounded" id="recommendation-duration-{{ $loop->index }}"></div>
+                                </div>
+
+                                <h3 class="text-sm font-semibold text-white truncate mt-1">{{ $recommendation->title }}</h3>
                                 <p class="text-xs text-white mt-1">{{ Str::limit($recommendation->deskripsi, 50) }}</p>
                             </div>
                         </div>
                         @endforeach
                     </section>
                 </div>
+
             </div>
         </div>
 
         <!-- Top Onema This Week Section -->
-        <div class="px-32 my-8"> <!-- Menambahkan padding horizontal untuk memindahkan konten ke kanan -->
+        <div class="px-32 my-8">
             <h1 class="text-black text-xl font-bold px-0 py-2 mb-6 inline-block rounded-r-lg ml-6">
-                <span class="border-l-4 border-black pl-2">Top Onema</span>
+                <span class="border-l-4 border-red-700 pl-2">Top Onema</span>
             </h1>
             <section>
                 <ul class="mt-8 grid grid-flow-row-dense gap-4 sm:grid-cols-3 lg:grid-cols-6">
                     @foreach ($topOnema as $trailers)
-                    <li class="p-2 rounded-x overflow-hidden relative text-white"
+                    <li class="p-2 overflow-hidden relative text-white"
                         data-title="{{ $trailers->title }}"
-                        data-poster="{{ asset('upload/' . $trailers->poster) }}">
+                        data-poster="{{ asset('upload/' . $trailers->poster) }}"
+                        data-trailer-id="{{ $trailers->id }}">
+
+
                         <!-- Konten trailer lainnya -->
-                        <div class="video-container rounded-t-2xl overflow-hidden" id="video-container-{{ $loop->index }}">
+                        <div class="video-container rounded-t-lg overflow-hidden" id="video-container-{{ $loop->index }}">
                             <a href="{{ route('home.detail', $trailers->id) }}">
                                 <video width="100%" height="250" poster="{{ asset('upload/' . $trailers->poster) }}" class="video h-[250px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[290px]" id="video-gladiator-{{ $loop->index }}">
                                     <source id="video-source-{{ $loop->index }}" src="{{ asset('upload/' . $trailers->vidio) }}" type="video/mp4">
                                 </video>
                             </a>
-                            <div class="absolute top-0 left-0 ">
-                                <i class='bx bxs-bookmark-star text-white text-2xl'></i>
+                            <div class="absolute -top-2 -left-3.5 flex items-center justify-center">
+                                <i class='bx bxs-bookmark-star text-gray-700 text-6xl'></i>
+                                <i class='bx bx-plus text-white absolute text-2xl' style="top: 10px;"></i>
                             </div>
+
                             <div class="absolute bottom-0 left-0 m-2 play-button">
                                 <div class="play-icon-container">
                                     <i class='bx bx-play text-white'></i>
@@ -1368,7 +1499,7 @@
                                 <div class="current-time text-white font-bold" id="current-time-{{ $loop->index }}"></div>
                             </div>
                         </div>
-                        <div class="bg-black bg-opacity-75 p-2 rounded-b-2xl">
+                        <div class="bg-black bg-opacity-75 p-2 rounded-b-lg">
                             <h3 class="text-sm">Official trailer</h3>
                             <h3 class="text-lg mt-1 font-semibold mb-2 truncate">{{ $trailers->title }}</h3>
                             <div class="flex items-center justify-between">
@@ -1379,7 +1510,7 @@
                                 <span id="like-count-{{ $loop->index }}">{{ $trailers->likes_count }}</span>
                                 <i class='bx bx-dislike ml-4 mr-2 cursor-pointer' id="dislike-{{ $loop->index }}"></i>
                                 <span id="dislike-count-{{ $loop->index }}">{{ $trailers->dislikes_count }}</span>
-                                <i class='bx {{ $watchlistItems->contains($trailers->id) ? "bxs-bookmark-star active-bookmark" : "bx-bookmark" }} ml-10 cursor-pointer text-xl ' id="bookmark-{{ $loop->index }}" data-trailer-id="{{ $trailers->id }}"></i>
+                                <i class="bx bxs-bookmark-star cursor-pointer px-2 {{ $trailers->watchlists->where('user_id', auth()->id())->count() ? 'text-red-700' : '' }}"></i>
                             </div>
                         </div>
                     </li>
@@ -1388,17 +1519,6 @@
             </section>
         </div>
     </div>
-
-    <!-- Modal -->
-    <div id="notificationModal" class="modal fixed inset-0 flex items-center justify-center hidden">
-        <div class="modal-content bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 scale-95 opacity-0">
-            <span class="close-modal cursor-pointer text-xl font-bold text-gray-700 hover:text-red-500">&times;</span>
-            <p id="modal-message" class="text-black text-center mt-4"></p>
-        </div>
-    </div>
-
-
-
     <!--end home-->
 
     <script>
@@ -1407,70 +1527,96 @@
             const menuLink = document.getElementById('menu-link');
             const popupOverlay = document.getElementById('popup-overlay');
             const closePopupButton = document.getElementById('close-popup');
+            const body = document.querySelector('body');
 
             if (menuLink) {
                 menuLink.addEventListener('click', function(event) {
                     event.preventDefault();
                     popupOverlay.classList.add('active');
+                    body.classList.add('overflow-hidden'); // Hilangkan scroll
                 });
             }
 
             if (closePopupButton) {
                 closePopupButton.addEventListener('click', function() {
-                    popupOverlay.classList.add('closing');
+                    popupOverlay.classList.add('closing'); // Tambahkan kelas closing
                     setTimeout(function() {
                         popupOverlay.classList.remove('active', 'closing');
-                    }, 300);
+                        body.classList.remove('overflow-hidden'); // Aktifkan scroll kembali
+                    }, 500); // Sesuaikan dengan durasi animasi
                 });
             }
 
-            //searchwatchlist
-            document.getElementById('modalWatchlistSearch').addEventListener('input', function() {
-                var filter = this.value.toLowerCase();
-                var items = document.querySelectorAll('#modalWatchlistItems .watchlist-item');
 
-                items.forEach(function(item) {
-                    var title = item.getAttribute('data-title');
-                    if (title.includes(filter)) {
-                        item.style.display = 'block';
+
+
+            //watchist modal
+            document.getElementById('watchlist-link').addEventListener('click', function(event) {
+                event.preventDefault();
+                const modal = document.getElementById('watchlistModal');
+                modal.classList.remove('hidden'); // Hapus class hidden untuk menampilkan modal
+                modal.classList.remove('modal-hide'); // Hapus class animasi hide (jika ada)
+                modal.classList.add('modal-show'); // Tambahkan class animasi show
+            });
+
+            document.querySelector('[data-modal-hide="watchlistModal"]').addEventListener('click', function() {
+                const modal = document.getElementById('watchlistModal');
+                modal.classList.remove('modal-show'); // Hapus class animasi show
+                modal.classList.add('modal-hide'); // Tambahkan class animasi hide
+
+                // Sembunyikan modal setelah animasi selesai
+                modal.addEventListener('animationend', function() {
+                    if (modal.classList.contains('modal-hide')) {
+                        modal.classList.add('hidden'); // Sembunyikan modal setelah animasi selesai
+                    }
+                }, {
+                    once: true
+                });
+            });
+
+            // Fitur search
+            document.getElementById('modalWatchlistSearch').addEventListener('input', function() {
+                const searchValue = this.value.toLowerCase();
+                const watchlistItems = document.querySelectorAll('.watchlist-item');
+
+                watchlistItems.forEach(function(item) {
+                    const title = item.getAttribute('data-title');
+
+                    // Cek apakah judul trailer cocok dengan input search
+                    if (title.includes(searchValue)) {
+                        item.style.display = 'block'; // Tampilkan item jika cocok
                     } else {
-                        item.style.display = 'none';
+                        item.style.display = 'none'; // Sembunyikan item jika tidak cocok
                     }
                 });
             });
 
-            //modal watchlist
-            document.getElementById('watchlist-link').addEventListener('click', function(event) {
-                event.preventDefault();
 
-                // Buka modal
-                document.getElementById('watchlistModal').classList.remove('hidden');
 
-                // Panggil AJAX untuk mendapatkan data watchlist
-                fetch('/watchlist-data')
-                    .then(response => response.json())
-                    .then(data => {
-                        let watchlistContent = '';
 
-                        if (data.length > 0) {
-                            data.forEach(item => {
-                                watchlistContent += `
-                        <div class="flex space-x-4 items-center mb-4">
-                            <img src="/upload/${item.trailer.poster}" alt="${item.trailer.title}" class="h-16 w-16 object-cover rounded">
-                            <span class="font-medium">${item.trailer.title}</span>
-                        </div>`;
-                            });
-                        } else {
-                            watchlistContent = '<p class="text-center text-gray-500">Your watchlist is empty.</p>';
+
+
+            //watchlist
+            $(document).ready(function() {
+                $('.bxs-bookmark-star').on('click', function() {
+                    var trailerId = $(this).closest('li').data('trailer-id');
+                    var bookmarkIcon = $(this);
+
+                    $.ajax({
+                        url: '/trailer/' + trailerId + '/bookmark',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                        },
+                        success: function(response) {
+                            if (response.status === 'added') {
+                                bookmarkIcon.addClass('text-red-700'); // Ganti warna saat ditambahkan
+                            } else {
+                                bookmarkIcon.removeClass('text-red-700'); // Kembali ke warna default saat dihapus
+                            }
                         }
-
-                        document.getElementById('modal-watchlist-content').innerHTML = watchlistContent;
                     });
-            });
-
-            // Tutup modal
-            document.querySelector('[data-modal-hide]').addEventListener('click', function() {
-                document.getElementById('watchlistModal').classList.add('hidden');
+                });
             });
 
 
@@ -1494,91 +1640,88 @@
 
                         data.forEach(item => {
                             recommendationsSection.innerHTML += `
-                        <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs">
-                            <div class="flex-shrink-0 w-1/4 relative">
-                                <a href="/home/detail/${item.id}">
-                                    <video width="100%" height="100%" poster="/upload/${item.poster}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
-                                        <source src="/upload/${item.vidio}" type="video/mp4">
-                                    </video>
-                                </a>
-                                <div class="absolute top-0 left-0 m-2">
-                                    <i class='bx bxs-bookmark-star text-white text-xl'></i>
-                                </div>
-                                <a href="/home/detail/${item.id}" class="absolute bottom-0 left-0 m-2 play-button">
-                                    <div class="play-icon-container play-icon-small">
-                                        <i class="fas fa-play text-white"></i>
-                                    </div>
-                                </a>
-                                <div class="video-duration font-bold absolute bottom-0 right-0 m-2"></div>
-                            </div>
-                            <div class="flex-1 p-2 flex flex-col justify-center">
-                                <h3 class="text-sm font-semibold text-white truncate">${item.title}</h3>
-                                <p class="text-xs text-white mt-1">${item.deskripsi.substring(0, 50)}...</p>
-                            </div>
+                <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs">
+                    <div class="flex-shrink-0 w-1/4 relative">
+                        <a href="/home/detail/${item.id}">
+                            <video width="100%" height="100%" poster="/upload/${item.poster}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                                <source src="/upload/${item.vidio}" type="video/mp4">
+                            </video>
+                        </a>
+                        <div class="absolute top-0 left-0 m-2">
+                            <i class='bx bxs-bookmark-star text-white text-xl'></i>
                         </div>
-                    `;
+                        <a href="/home/detail/${item.id}" class="absolute bottom-0 left-0 m-2 play-button">
+                            <div class="play-icon-container play-icon-small">
+                                <i class="fas fa-play text-white"></i>
+                            </div>
+                        </a>
+                        <div class="video-duration font-bold absolute bottom-0 right-0 m-2">${item.duration}</div>
+                    </div>
+                    <div class="flex-1 p-2 flex flex-col justify-center">
+                        <h3 class="text-sm font-semibold text-white truncate">${item.title}</h3>
+                        <p class="text-xs text-white mt-1">${item.deskripsi.substring(0, 50)}...</p>
+                    </div>
+                </div>
+                `;
                         });
                     })
                     .catch(error => console.error('Error fetching recommendations:', error));
             }
 
 
+            // Video Duration
+            const sliderImages = document.querySelectorAll('.slider img'); // Mengambil gambar di slider
+            const recommendationVideos = document.querySelectorAll('.flex.flex-col.space-y-4 video'); // Mengambil video di rekomendasi
 
-            //warna menit
-            document.querySelectorAll('.video-thumbnail').forEach(function(thumbnail) {
-                const img = thumbnail.querySelector('img');
-                const durationText = thumbnail.querySelector('.video-duration');
+            // Format Durasi
+            function formatDuration(duration) {
+                const minutes = Math.floor(duration / 60);
+                const seconds = Math.floor(duration % 60);
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
 
-                if (img) {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+            // Update Durasi Slider Video
+            function updateSliderDuration(video, index) {
+                video.addEventListener('loadedmetadata', function() {
+                    const duration = formatDuration(video.duration);
+                    const durationElement = document.getElementById(`slider-duration-${index}`);
+                    if (durationElement) {
+                        durationElement.textContent = duration;
+                    }
+                });
+            }
 
-                    img.onload = function() {
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0, img.width, img.height);
+            // Update Durasi Rekomendasi Video
+            function updateRecommendationDuration(video, index) {
+                video.addEventListener('loadedmetadata', function() {
+                    const duration = formatDuration(video.duration);
+                    const durationElement = document.getElementById(`recommendation-duration-${index}`);
+                    if (durationElement) {
+                        durationElement.textContent = duration;
+                    }
+                });
+            }
 
-                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-                        let r = 0,
-                            g = 0,
-                            b = 0;
-                        let count = 0;
-
-                        for (let i = 0; i < imageData.data.length; i += 4) {
-                            r += imageData.data[i];
-                            g += imageData.data[i + 1];
-                            b += imageData.data[i + 2];
-                            count++;
-                        }
-
-                        // Rata-rata warna
-                        r = Math.floor(r / count);
-                        g = Math.floor(g / count);
-                        b = Math.floor(b / count);
-
-                        // Deteksi apakah warna dominan lebih mendekati putih atau hitam
-                        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-
-                        if (brightness > 150) {
-                            // Jika poster terang, buat teks menit menjadi hitam
-                            durationText.style.color = "black";
-                        } else if (brightness < 50) {
-                            // Jika poster sangat gelap, buat teks menit menjadi putih
-                            durationText.style.color = "white";
-                        } else {
-                            // Jika poster berwarna lain, tetap buat teks menjadi putih
-                            durationText.style.color = "white";
-                        }
-                    };
-                }
+            // Ambil elemen video dari slider dan tampilkan durasi
+            document.querySelectorAll('.slides video').forEach((video, index) => {
+                updateSliderDuration(video, index);
             });
+            recommendationVideos.forEach((video, index) => {
+                updateRecommendationDuration(video, index);
+            });
+
+
+
+
 
             //slider
             const slides = document.querySelector('.slides');
             const slideCount = document.querySelectorAll('.slide').length;
             let currentIndex = 0;
             let autoSlideInterval;
-            let manualSlideTimeout;
+            let isDragging = false;
+            let startPos = 0;
+            let isDraggingAction = false; // Tambahkan ini
 
             function updateSlidePosition() {
                 slides.style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -1591,16 +1734,10 @@
             }
 
             function resetAutoSlide() {
-                clearInterval(autoSlideInterval); // Hentikan sementara penggeseran otomatis
-                clearTimeout(manualSlideTimeout); // Hentikan timeout yang sebelumnya ada
-
-                // Tunggu 18 detik sebelum memulai kembali penggeseran otomatis
-                manualSlideTimeout = setTimeout(() => {
-                    startAutoSlide();
-                }, 18000);
+                clearInterval(autoSlideInterval);
+                startAutoSlide();
             }
 
-            // Kontrol slide manual
             document.getElementById('nextSlide').addEventListener('click', () => {
                 if (currentIndex < slideCount - 1) {
                     currentIndex++;
@@ -1608,7 +1745,7 @@
                     currentIndex = 0;
                 }
                 updateSlidePosition();
-                resetAutoSlide(5000); // Atur ulang penggeseran otomatis setelah slide manual
+                resetAutoSlide();
             });
 
             document.getElementById('prevSlide').addEventListener('click', () => {
@@ -1618,79 +1755,63 @@
                     currentIndex = slideCount - 1;
                 }
                 updateSlidePosition();
-                resetAutoSlide(18000); // Atur ulang penggeseran otomatis setelah slide manual
+                resetAutoSlide();
             });
 
-            // Memulai penggeseran otomatis saat halaman dimuat
-            startAutoSlide();
+            document.querySelector('.slider').addEventListener('mousedown', (event) => {
+                event.preventDefault();
 
+                isDragging = true;
+                isDraggingAction = false;
+                startPos = event.clientX;
 
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('mouseup', onDragEnd);
+            });
 
+            function onDrag(event) {
+                if (!isDragging) return;
 
-            // Bookmark 
-            $(document).on('click', '.bx-bookmark, .active-bookmark', function() {
-                var $bookmarkIcon = $(this); // Ambil elemen bookmark yang di klik
-                var trailerId = $bookmarkIcon.data('trailer-id'); // Ambil ID trailer dari data attribute
-                console.log('Bookmark icon clicked:', trailerId); // Log saat icon di klik
+                const currentPos = event.clientX;
+                const movedBy = currentPos - startPos;
 
-                $.ajax({
-                    url: '/toggle-watchlist/' + trailerId,
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        console.log('Response from server:', response); // Log respons server
-                        var message = ''; // Variabel untuk menyimpan pesan
+                if (Math.abs(movedBy) > 50) {
+                    isDraggingAction = true;
+                }
 
-                        if (response.status === 'added') {
-                            $bookmarkIcon.removeClass('bx-bookmark').addClass('active-bookmark');
-                            $bookmarkIcon.css('color', 'white'); // Paksa warna jadi putih
-                            message = 'Trailer ditambahkan ke watchlist.'; // Pesan untuk modal
-                        } else if (response.status === 'removed') {
-                            $bookmarkIcon.removeClass('active-bookmark').addClass('bx-bookmark');
-                            $bookmarkIcon.css('color', 'gray'); // Kembalikan warna jadi abu-abu
-                            message = 'Trailer dihapus dari watchlist.'; // Pesan untuk modal
-                        }
+                if (movedBy < -100 && currentIndex < slideCount - 1) {
+                    currentIndex++;
+                    updateSlidePosition();
+                    isDragging = false;
+                } else if (movedBy > 100 && currentIndex > 0) {
+                    currentIndex--;
+                    updateSlidePosition();
+                    isDragging = false;
+                }
+            }
 
-                        // Tampilkan modal dengan pesan
-                        $('#modal-message').text(message);
-                        $('#notificationModal .modal-content').addClass('show'); // Tampilkan modal dengan animasi
-                        $('#notificationModal').removeClass('hidden'); // Tampilkan modal
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error); // Log error di console
+            function onDragEnd() {
+                isDragging = false;
+                document.removeEventListener('mousemove', onDrag);
+                document.removeEventListener('mouseup', onDragEnd);
+                resetAutoSlide();
+            }
+
+            document.querySelectorAll('.slide a').forEach(anchor => {
+                anchor.addEventListener('click', function(event) {
+                    if (isDraggingAction) {
+                        event.preventDefault();
                     }
                 });
             });
 
-            // Menutup modal ketika diklik
-            $(document).on('click', '.close-modal', function() {
-                $('#notificationModal .modal-content').removeClass('show'); // Hapus animasi saat modal ditutup
-                setTimeout(function() {
-                    $('#notificationModal').addClass('hidden'); // Sembunyikan modal setelah animasi selesai
-                }, 300); // Waktu delay harus sama dengan durasi transisi CSS
-            });
-
-            // Menutup modal saat klik di luar konten modal
-            $(document).on('click', '#notificationModal', function(event) {
-                if ($(event.target).is('#notificationModal')) {
-                    $('#notificationModal .modal-content').removeClass('show'); // Hapus animasi saat modal ditutup
-                    setTimeout(function() {
-                        $('#notificationModal').addClass('hidden'); // Sembunyikan modal setelah animasi selesai
-                    }, 300); // Waktu delay harus sama dengan durasi transisi CSS
-                }
-            });
-
-
-
-
-
+            startAutoSlide();
 
             // Search
             const searchInput = document.getElementById('search-input');
             const suggestions = document.getElementById('suggestions');
             const searchHistoryContainer = document.getElementById('search-history');
+            const searchContainer = document.querySelector('.relative.flex-1');
 
             // Array untuk menyimpan riwayat pencarian
             let searchHistory = [];
@@ -1708,9 +1829,23 @@
                 updateSuggestions(searchQuery);
             });
 
+            // Event listener untuk menampilkan riwayat pencarian saat mengklik input pencarian
+            searchInput.addEventListener('focus', function() {
+                if (searchHistory.length > 0) {
+                    updateSearchHistory();
+                }
+            });
+
+            // Event listener untuk menyembunyikan riwayat dan saran pencarian jika klik di luar
+            document.addEventListener('click', function(e) {
+                if (!searchContainer.contains(e.target)) {
+                    searchHistoryContainer.classList.add('hidden');
+                    suggestions.classList.add('hidden');
+                }
+            });
+
             // Fungsi untuk memperbarui saran pencarian dengan poster kecil
             function updateSuggestions(query) {
-                // Kosongkan elemen saran sebelum menambahkan yang baru
                 suggestions.innerHTML = '';
 
                 if (query) {
@@ -1765,23 +1900,18 @@
                 }
             }
 
-            // Fungsi untuk melakukan pencarian dan mengatur scroll halaman
             function performSearch(query) {
-                // Lakukan pencarian di sini (kode pencarian dapat disesuaikan)
-
-                // Contoh logika pencarian sederhana: filter elemen berdasarkan judul
                 const trailers = document.querySelectorAll('li[data-title]');
                 trailers.forEach(function(trailer) {
                     const title = trailer.getAttribute('data-title').toLowerCase();
                     if (title.includes(query.toLowerCase())) {
-                        trailer.classList.remove('hidden'); // Tampilkan trailer yang sesuai
+                        trailer.classList.remove('hidden');
                     } else {
-                        trailer.classList.add('hidden'); // Sembunyikan trailer yang tidak sesuai
+                        trailer.classList.add('hidden');
                     }
                 });
 
-                // Scroll otomatis ke bagian "Top Onema"
-                const topOnemaSection = document.querySelector('.px-32'); // Elemen yang mengandung "Top Onema"
+                const topOnemaSection = document.querySelector('.px-32');
                 if (topOnemaSection) {
                     topOnemaSection.scrollIntoView({
                         behavior: 'smooth'
@@ -1808,15 +1938,35 @@
             // Fungsi untuk memperbarui riwayat pencarian (tambahkan logika sesuai kebutuhan)
             function updateSearchHistory() {
                 searchHistoryContainer.innerHTML = '';
-                searchHistory.forEach(function(item) {
+                searchHistory.forEach(function(item, index) {
                     const historyItem = document.createElement('div');
-                    historyItem.textContent = item;
+                    historyItem.className = 'flex justify-between items-center p-2';
+
+                    // Tampilkan item riwayat pencarian
+                    const historyText = document.createElement('span');
+                    historyText.textContent = item;
+                    historyItem.appendChild(historyText);
+
+                    // Tambahkan tombol hapus
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerHTML = "<i class='bx bx-x text-red-500 text-3xl'></i>";
+                    deleteButton.className = 'ml-2 text-red-600 hover:underline';
+                    deleteButton.addEventListener('click', function() {
+                        removeSearchHistory(index);
+                    });
+
+                    historyItem.appendChild(deleteButton);
                     searchHistoryContainer.appendChild(historyItem);
                 });
 
                 searchHistoryContainer.classList.remove('hidden');
             }
 
+            // Fungsi untuk menghapus item riwayat pencarian
+            function removeSearchHistory(index) {
+                searchHistory.splice(index, 1); // Hapus item dari array
+                updateSearchHistory(); // Perbarui tampilan riwayat pencarian
+            }
 
             //tambah
             const addButton = document.querySelector('#tambah-link');
@@ -1920,42 +2070,14 @@
                 });
             });
 
-            // Video Duration
-            const videoElements = document.querySelectorAll('video');
-            const durationElements = document.querySelectorAll('.video-duration');
 
-            videoElements.forEach((video, index) => {
-                const durationElement = durationElements[index];
 
-                if (video && durationElement) {
-                    video.addEventListener('loadedmetadata', function() {
-                        const duration = video.duration;
-                        const minutes = Math.floor(duration / 60);
-                        const seconds = Math.floor(duration % 60);
-                        const formattedDuration = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                        durationElement.textContent = formattedDuration;
-                    });
-                }
-            });
 
             // Kontrol kecepatan
             document.querySelectorAll('.speed-control').forEach(select => {
                 select.addEventListener('change', function() {
                     const video = this.closest('.video-controls').previousElementSibling.querySelector('video');
                     video.playbackRate = parseFloat(this.value);
-                });
-            });
-
-            // Kontrol kualitas
-            document.querySelectorAll('.quality-control').forEach(select => {
-                select.addEventListener('change', function() {
-                    const quality = this.value;
-                    const videoContainer = this.closest('.video-controls').previousElementSibling;
-                    const video = videoContainer.querySelector('video');
-                    const videoSrc = video.querySelector('source').src;
-
-                    // Simpan logika penggantian kualitas video di sini
-                    alert(`Kualitas video diubah ke ${quality}p (ini hanya demo, fungsionalitas pengubahan kualitas belum diimplementasikan).`);
                 });
             });
 
@@ -2081,6 +2203,7 @@
                 });
             }
 
+            //akun
             const akunLink = document.getElementById('akun-link');
             const accountLink = document.getElementById('account-link');
             const akunPopup = document.getElementById('akun-popup');
@@ -2153,6 +2276,7 @@
             const closeSettingsModal = document.getElementById('close-modal');
             const closeSettingsButton = document.getElementById('close-modal-button');
 
+            // Buka modal settings
             if (settingsLink) {
                 settingsLink.addEventListener('click', function(event) {
                     event.preventDefault();
@@ -2161,6 +2285,7 @@
                 });
             }
 
+            // Tutup modal settings
             if (closeSettingsModal) {
                 closeSettingsModal.addEventListener('click', function() {
                     settingsModal.classList.add('hidden');
@@ -2175,6 +2300,7 @@
                 });
             }
 
+            // Ganti tema (light atau dark)
             document.getElementById('theme-select').addEventListener('change', function() {
                 const theme = this.value;
                 if (theme === 'dark') {
@@ -2184,15 +2310,61 @@
                 }
             });
 
+            // Ganti bahasa secara dinamis
             document.getElementById('language-select').addEventListener('change', function() {
                 const language = this.value;
-                // Implementasi untuk mengganti bahasa sesuai pilihan
                 if (language === 'english') {
-                    // Ganti teks ke bahasa Inggris
+                    changeLanguage('en'); // Ganti ke bahasa Inggris
                 } else {
-                    // Ganti teks ke bahasa Indonesia
+                    changeLanguage('id'); // Ganti ke bahasa Indonesia
                 }
             });
+
+            // Fungsi untuk mengganti teks berdasarkan bahasa yang dipilih
+            function changeLanguage(lang) {
+                fetch(`/lang/${lang}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelector('h3').textContent = data.settings;
+                        document.querySelector('label[for="language-select"]').textContent = data.select_language;
+                        document.querySelector('label[for="theme-select"]').textContent = data.select_theme;
+                        document.getElementById('close-modal-button').textContent = data.save;
+
+                        // Ganti opsi dropdown bahasa
+                        document.querySelector('#language-select option[value="english"]').textContent = data.english;
+                        document.querySelector('#language-select option[value="indo"]').textContent = data.indonesian;
+
+                        // Ganti opsi dropdown tema
+                        document.querySelector('#theme-select option[value="light"]').textContent = data.light;
+                        document.querySelector('#theme-select option[value="dark"]').textContent = data.dark;
+                    });
+            }
+
+
+            document.getElementById('language-select').addEventListener('change', function() {
+                const language = this.value;
+
+                // AJAX untuk mengganti bahasa
+                fetch('/change-language', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            lang: language
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload(); // Refresh halaman agar bahasa diperbarui
+                        }
+                    });
+            });
+
+
+
+
 
             // Video controls only on play
             document.querySelectorAll('.play-button').forEach(button => {

@@ -14,6 +14,7 @@ use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
@@ -26,14 +27,13 @@ class HomeController extends Controller
             ->orderBy('populer', 'desc')
             ->get();
 
-        $watchlistItems = Watchlist::where('user_id', Auth::id())
-            ->with('trailer')
-            ->get();
-
         $availableAccounts = User::where('id', '!=', Auth::id())->get();
 
-        return view('home.homepage', compact('slider', 'recommendations', 'topOnema', 'watchlistItems', 'availableAccounts'));
+        $watchlistItems = Watchlist::where('user_id', Auth::id())->with('trailer')->get();
+
+        return view('home.homepage', compact('slider', 'recommendations', 'topOnema', 'availableAccounts', 'watchlistItems'));
     }
+
 
 
     public function ikmal()
@@ -46,30 +46,33 @@ class HomeController extends Controller
         $request->validate([
             'gridTitle' => 'required|string|max:255',
             'gridDeskripsi' => 'required|string',
-            'gridVidio' => 'required|file|mimes:mp4,mov,avi,wmv|max:20480',
-            'gridPoster' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gridVidio' => 'required|file|mimes:mp4,mov,avi,wmv|max:27480',
+            'gridPoster' => 'required|mimes:jpeg,png,jpg,gif,svg,webp|max:2548',
+            'gridThumbnail' => 'required|mimes:jpeg,png,jpg,gif,svg,webp|max:2548', // Validasi thumbnail
             'gridTahun' => 'required|integer',
             'gridOpsi' => 'required|string',
         ]);
 
-        if ($request->hasFile('gridVidio') && $request->hasFile('gridPoster')) {
+        if ($request->hasFile('gridVidio') && $request->hasFile('gridPoster') && $request->hasFile('gridThumbnail')) {
 
             $videoName = $request->file('gridVidio')->getClientOriginalName();
             $posterName = $request->file('gridPoster')->getClientOriginalName();
+            $thumbnailName = $request->file('gridThumbnail')->getClientOriginalName(); // Ambil nama file thumbnail
 
             $request->file('gridVidio')->move(public_path() . '/upload', $videoName);
             $request->file('gridPoster')->move(public_path() . '/upload', $posterName);
+            $request->file('gridThumbnail')->move(public_path() . '/upload', $thumbnailName); // Simpan thumbnail
 
             DB::table('_trailer')->insert([
                 'title' => $request->input('gridTitle'),
                 'deskripsi' => $request->input('gridDeskripsi'),
                 'vidio' => $videoName,
                 'poster' => $posterName,
+                'thumbnail' => $thumbnailName, // Simpan nama thumbnail ke database
                 'tahun' => $request->input('gridTahun'),
                 'populer' => $request->input('gridOpsi'),
             ]);
         }
-
 
         return redirect()->route('home')->with('success', 'Film berhasil ditambahkan!');
     }
@@ -148,70 +151,104 @@ class HomeController extends Controller
         ]);
 
         if ($request->ajax()) {
+            // Mendapatkan foto profil pengguna
+            $profilePhoto = auth()->user()->profile_photo_path
+                ? asset('storage/' . auth()->user()->profile_photo_path)
+                : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg';
+
             return response()->json([
                 'comment' => $comment->comment,
                 'created_at' => now()->diffForHumans(),
-                'user_name' => auth()->user()->username
+                'user_name' => auth()->user()->username,
+                'profile_photo' => $profilePhoto,
             ]);
         }
 
         return redirect()->back()->with('success', 'Komentar berhasil ditambahkan.');
     }
 
-    public function likeComment($id)
+
+    public function toggleLikeComment(Request $request, $commentId)
     {
-        $comment = Comment::findOrFail($id);
-        $user_id = Auth::id();
+        $user = auth()->user();
+        $comment = Comment::find($commentId);
 
-        $existing_like = LikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
-        $existing_dislike = DislikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
-
-        if ($existing_like) {
-            $existing_like->delete();
-            $like_count = LikeComment::where('comment_id', $id)->count();
-            return response()->json(['status' => 'like removed', 'like_count' => $like_count]);
-        } else {
-            LikeComment::create([
-                'user_id' => $user_id,
-                'comment_id' => $id,
-            ]);
-
-            if ($existing_dislike) {
-                $existing_dislike->delete();
-            }
-
-            $like_count = LikeComment::where('comment_id', $id)->count();
-            return response()->json(['status' => 'liked', 'like_count' => $like_count]);
+        if (!$comment) {
+            return response()->json(['message' => 'Comment not found'], 404);
         }
+
+        // Hapus dislike jika ada
+        $existingDislike = DislikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
+        if ($existingDislike) {
+            $existingDislike->delete();
+        }
+
+        // Cek apakah sudah like, jika iya hapus like
+        $existingLike = LikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
+        if ($existingLike) {
+            $existingLike->delete();
+            return response()->json([
+                'message' => 'Like removed',
+                'likeCount' => $comment->likes()->count(),
+                'dislikeCount' => $comment->dislikes()->count(),
+                'status' => 'unliked'
+            ], 200);
+        }
+
+        // Jika belum like, tambahkan like
+        LikeComment::create([
+            'user_id' => $user->id,
+            'comment_id' => $commentId,
+        ]);
+
+        return response()->json([
+            'message' => 'Comment liked',
+            'likeCount' => $comment->likes()->count(),
+            'dislikeCount' => $comment->dislikes()->count(),
+            'status' => 'liked'
+        ], 200);
     }
 
-    public function dislikeComment($id)
+    public function toggleDislikeComment(Request $request, $commentId)
     {
-        $comment = Comment::findOrFail($id);
-        $user_id = Auth::id();
+        $user = auth()->user();
+        $comment = Comment::find($commentId);
 
-        $existing_dislike = DislikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
-        $existing_like = LikeComment::where('comment_id', $id)->where('user_id', $user_id)->first();
-
-        if ($existing_dislike) {
-            $existing_dislike->delete();
-            $dislike_count = DislikeComment::where('comment_id', $id)->count();
-            return response()->json(['status' => 'dislike removed', 'dislike_count' => $dislike_count]);
-        } else {
-            DislikeComment::create([
-                'user_id' => $user_id,
-                'comment_id' => $id,
-            ]);
-
-            if ($existing_like) {
-                $existing_like->delete();
-            }
-
-            $dislike_count = DislikeComment::where('comment_id', $id)->count();
-            return response()->json(['status' => 'disliked', 'dislike_count' => $dislike_count]);
+        if (!$comment) {
+            return response()->json(['message' => 'Comment not found'], 404);
         }
-    }
 
+        // Hapus like jika ada
+        $existingLike = LikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
+        if ($existingLike) {
+            $existingLike->delete();
+        }
+
+        // Cek apakah sudah dislike, jika iya hapus dislike
+        $existingDislike = DislikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
+        if ($existingDislike) {
+            $existingDislike->delete();
+            return response()->json([
+                'message' => 'Dislike removed',
+                'likeCount' => $comment->likes()->count(),
+                'dislikeCount' => $comment->dislikes()->count(),
+                'status' => 'undisliked'
+            ], 200);
+        }
+
+        // Jika belum dislike, tambahkan dislike
+        DislikeComment::create([
+            'user_id' => $user->id,
+            'comment_id' => $commentId,
+        ]);
+
+        return response()->json([
+            'message' => 'Comment disliked',
+            'likeCount' => $comment->likes()->count(),
+            'dislikeCount' => $comment->dislikes()->count(),
+            'status' => 'disliked'
+        ], 200);
+    }
 
     public function storeReply(Request $request, Comment $comment)
     {
@@ -229,43 +266,47 @@ class HomeController extends Controller
             'user_name' => auth()->user()->username,
             'reply' => $reply->reply,
             'created_at' => $reply->created_at->diffForHumans(),
+            'profile_photo_path' => auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
+            'reply_id' => $reply->id, // Mengirimkan ID balasan untuk penggunaan di frontend
         ]);
     }
+
+
 
     public function rateVideo(Request $request, $id)
     {
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
         ]);
-
+    
         $trailer = Trailer::findOrFail($id);
         $user = Auth::user();
-
+    
         $existingRating = Rating::where('user_id', $user->id)
             ->where('trailer_id', $trailer->id)
             ->first();
-
+    
         if ($existingRating) {
             return response()->json([
                 'message' => 'Anda sudah memberikan rating untuk video ini.',
                 'averageRating' => $trailer->averageRating(),
             ]);
         }
-
+    
         Rating::create([
             'user_id' => $user->id,
             'trailer_id' => $trailer->id,
             'rating' => $request->rating,
         ]);
-
-        $averageRating = $trailer->averageRating();
-
+    
+        // Kembalikan rata-rata rating terbaru setelah rating berhasil
         return response()->json([
-            'message' => 'Terima kasih atas rating Anda!',
-            'averageRating' => $averageRating,
+            'message' => 'Rating berhasil diberikan.',
+            'averageRating' => $trailer->averageRating(),
         ]);
     }
-
+    
+    
     public function deleteRating(Request $request, $id)
     {
         $trailer = Trailer::findOrFail($id);
@@ -291,43 +332,49 @@ class HomeController extends Controller
         ]);
     }
 
-    public function watchlist()
+
+
+    public function toggleWatchlist(Request $request, $trailerId)
     {
-        $user = Auth::user();
+        $userId = auth()->id();
 
-        $watchlistItems = Watchlist::where('user_id', $user->id)
-            ->with('trailer')
-            ->get();
+        // Cek apakah trailer sudah ada di watchlist user
+        $existingWatchlist = Watchlist::where('user_id', $userId)
+            ->where('trailer_id', $trailerId)
+            ->first();
 
-        return view('home.watchlists', compact('watchlistItems'));
-    }
-
-
-    public function toggleWatchlist($id)
-    {
-        $user = Auth::user();
-        $watchlistItem = Watchlist::where('user_id', $user->id)->where('trailer_id', $id)->first();
-
-        if ($watchlistItem) {
-            $watchlistItem->delete(); // Hapus dari watchlist jika sudah ada
+        if ($existingWatchlist) {
+            // Jika sudah ada, hapus dari watchlist
+            $existingWatchlist->delete();
             return response()->json(['status' => 'removed']);
         } else {
+            // Jika belum ada, tambahkan ke watchlist
             Watchlist::create([
-                'user_id' => $user->id,
-                'trailer_id' => $id
-            ]); // Tambahkan ke watchlist jika belum ada
+                'user_id' => $userId,
+                'trailer_id' => $trailerId,
+            ]);
             return response()->json(['status' => 'added']);
         }
     }
 
-
-
-
-    // WatchlistController.php
-    public function getWatchlistData()
+    public function watchlist()
     {
-        $watchlistItems = Watchlist::with('trailer')->where('user_id', auth()->id())->get();
+        $watchlistItems = Watchlist::where('user_id', auth()->id())
+            ->whereHas('trailer')
+            ->with('trailer')
+            ->get() ?? [];
 
-        return response()->json($watchlistItems);
+        return view('home.watchlists', compact('watchlistItems'));
+    }
+
+    public function changeLanguage(Request $request)
+    {
+        $lang = $request->input('lang');
+        if (in_array($lang, ['en', 'id'])) {
+            session(['language' => $lang]); // Mengubah session key menjadi 'language'
+            App::setLocale($lang);
+        }
+
+        return redirect()->back(); // Kembali ke halaman sebelumnya
     }
 }

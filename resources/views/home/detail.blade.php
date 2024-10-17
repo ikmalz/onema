@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail</title>
+    <link rel="icon" href="../asset/foto/logoonema.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
@@ -209,7 +210,7 @@
 
     #sinopsis-container p {
         margin: 0;
-        padding-bottom: 0.4rem;
+        padding-bottom: 0.6rem;
     }
 
 
@@ -221,7 +222,6 @@
 
     #like-dislike-container {
         margin-top: 10px;
-        /* Add some space between the video and the buttons */
         justify-content: flex-start;
         /* Align buttons to the left */
         width: 80%;
@@ -241,6 +241,34 @@
     .bx-dislike {
         font-size: 1.5rem;
         cursor: pointer;
+    }
+
+    /* Style for hovered empty stars */
+    .empty-star:hover,
+    .empty-star:hover~.empty-star {
+        color: yellow;
+    }
+
+    /* Default color for empty stars */
+    .empty-star {
+        color: gray;
+        transition: color 0.3s ease;
+    }
+
+    /* Selected stars (those that have been rated) */
+    .selected {
+        color: yellow;
+    }
+
+    /* Optional: Prevent filled stars from changing color on hover */
+    .selected:hover {
+        color: yellow !important;
+    }
+
+    #star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        /* Membalikkan urutan bintang */
     }
 
     #star-rating svg {
@@ -339,6 +367,7 @@
 
         <!-- Like and Dislike Buttons -->
         <div id="like-dislike-container" class="flex items-center p-3">
+            @auth
             <button id="like-btn" class="like-icon mr-4" data-id="{{ $detail->id }}">
                 <i class='bx bx-like text-2xl {{ $detail->isLiked() ? 'text-red-500' : 'text-gray-500' }}'></i>
             </button>
@@ -346,6 +375,14 @@
             <button id="dislike-btn" class="dislike-icon" data-id="{{ $detail->id }}">
                 <i class='bx bx-dislike text-2xl {{ $detail->isDisliked() ? 'text-blue-500' : 'text-gray-500' }}'></i>
             </button>
+            @else
+            <button class="mr-4 text-gray-500" disabled>
+                <i class='bx bx-like text-2xl'></i>
+            </button>
+            <button class="text-gray-500" disabled>
+                <i class='bx bx-dislike text-2xl'></i>
+            </button>
+            @endauth
         </div>
 
     </section>
@@ -380,10 +417,10 @@
                                 </button>
 
                                 <!-- Tombol Hapus di Pop-up -->
-                                <div id="popup-menu" class="absolute right-0 mt-2 w-24 bg-white text-black rounded-md shadow-lg hidden">
+                                <div id="popup-menu" class="absolute right-0 mt-2 w-24 bg-white text-black rounded-md shadow-lg hidden z-50">
                                     <ul>
                                         <li>
-                                            <button id="delete-rating-btn" class="w-full px-4 py-2 text-left hover:bg-red-500 hover:text-white">
+                                            <button id="delete-rating-btn" class="w-full px-4 py-2 text-left hover:bg-red-500 hover:rounded-md hover:text-white">
                                                 Hapus
                                             </button>
                                         </li>
@@ -393,20 +430,23 @@
                         </div>
 
                         <!-- Rating Stars -->
+                        <!-- Bintang Rating -->
                         <div class="flex items-center text-white">
                             @php
-                            $averageRating = $detail->averageRating();
-                            $fullStars = floor($averageRating);
-                            $halfStar = $averageRating - $fullStars >= 0.5 ? true : false;
-                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                            $averageRating = $detail->averageRating(); // Menghitung rata-rata rating
+                            $fullStars = floor($averageRating); // Bintang penuh
+                            $halfStar = $averageRating - $fullStars >= 0.5 ? true : false; // Setengah bintang
+                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Bintang kosong
                             @endphp
 
+                            <!-- Tampilkan bintang penuh -->
                             @for ($i = 0; $i < $fullStars; $i++)
                                 <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                 <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
                                 </svg>
                                 @endfor
 
+                                <!-- Tampilkan setengah bintang (jika ada) -->
                                 @if ($halfStar)
                                 <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                     <path d="M11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
@@ -414,37 +454,39 @@
                                 </svg>
                                 @endif
 
+                                <!-- Tampilkan bintang kosong -->
                                 @for ($i = 0; $i < $emptyStars; $i++)
                                     <svg class="w-4 h-4 text-gray-300 me-1 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                     <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
                                     </svg>
                                     @endfor
 
+                                    <!-- Tampilkan nilai rating -->
                                     <div class="flex items-center text-white">
-                                        <p class="average-rating">{{ number_format($detail->averageRating(), 2) }}</p>
+                                        <p class="average-rating">{{ number_format($averageRating, 2) }}</p>
                                         <p class="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">out of 5</p>
                                     </div>
                         </div>
 
+
                         <!-- Bintang rating jika user belum memberikan rating -->
-                        @if (!$userHasRated)
+                        @if (auth()->check() && !$userHasRated)
                         <div id="star-rating" class="flex items-center my-2">
                             @for ($i = 1; $i <= 5; $i++)
-                                <svg data-value="{{ $i }}" class="w-8 h-8 text-gray-400 cursor-pointer hover:text-yellow-300 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <svg data-value="{{ $i }}" class="w-8 h-8 text-gray-400 cursor-pointer empty-star hover:text-yellow-300 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <defs>
                                     <linearGradient id="grad{{ $i }}" x1="0%" y1="0%" x2="100%">
                                         <stop offset="0%" style="stop-color:yellow;stop-opacity:1" />
                                         <stop offset="0%" style="stop-color:gray;stop-opacity:1" />
                                     </linearGradient>
                                 </defs>
-                                <path fill="url(#grad{{ $i }})" d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.67 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.67 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
                                 </svg>
                                 @endfor
                         </div>
-                        @else
-                        <p class="text-gray-400">Anda sudah memberikan rating untuk video ini.</p>
+                        @elseif(auth()->guest())
+                        <p class="text-gray-400">Login untuk memberikan rating.</p>
                         @endif
-
 
                         <!-- Hidden Form -->
                         <form id="rating-form" action="{{ route('video.rate', $detail->id) }}" method="POST" class="hidden">
@@ -468,7 +510,7 @@
                 <p class="paragraph">{{ $paragraph }}</p>
                 @endforeach
             </div>
-            <button id="toggle-sinopsis" class="text-red-600 hover:underline mt-2">Selengkapnya</button>
+            <button id="toggle-sinopsis" class="text-red-600 hover:underline mt-1">Selengkapnya</button>
             <hr class="border-gray-600 my-4">
         </div>
 
@@ -476,11 +518,16 @@
         <div id="chat-container" class="w-full max-w-3xl mx-auto bg-black p-4 rounded-b-lg flex flex-col h-full bg-[linear-gradient(to_bottom,_rgba(31,41,55,1)_0%,_rgba(31,41,55,0)_40%)]">
             <h3 class="text-xl font-semibold mb-4 text-white">Komentar</h3>
 
-            <form id="comment-form" action="{{ route('comment.store', $detail->id) }}" method="POST" class="flex items-center w-full mb-4">
+            @auth
+            <form id="comment-form" action="{{ route('comment.store', $detail->id) }}" method="POST" class="flex items-center mb-4">
                 @csrf
-                <input type="text" name="comment" placeholder="Tulis komentar..." class="flex-grow py-2 px-3 border-b-2 border-gray-500 bg-transparent text-white focus:border-red-700">
-                <button type="submit" class="ml-4 p-2 bg-red-700 text-white rounded-lg hover:bg-red-800 focus:ring-red-700">Kirim</button>
+                <input type="text" name="comment" placeholder="Tulis komentar..." class="flex-grow py-2 px-3 border-b-2 border-gray-500 bg-transparent text-white focus:border-red-700 focus:outline-none placeholder-gray-400" required>
+                <button type="submit" class="ml-4 p-2 bg-red-700 text-white rounded-lg hover:bg-red-800 focus:ring focus:ring-red-500 focus:ring-opacity-50">Kirim</button>
             </form>
+            @else
+            <p class="text-gray-400 py-5">Login untuk menulis komentar.</p>
+            @endauth
+
 
             <!-- Chat Messages -->
             <div id="chat-messages" class="text-left flex-grow overflow-y-auto max-h-[300px]">
@@ -501,15 +548,20 @@
                         <p class="text-sm font-light py-1">{{ $comment->comment }}</p>
                         <div class="flex items-center space-x-3 mt-2">
                             <button class="like-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-like text-lg"></i> {{ is_countable($comment->likes) ? $comment->likes->count() : 0 }}
+                                <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
                             </button>
+                            <span class="like-count">{{ $comment->likes->count() }}</span>
+
                             <button class="dislike-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-dislike text-lg"></i> {{ is_countable($comment->dislikes) ? $comment->dislikes->count() : 0 }}
+                                <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
                             </button>
+                            <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
+
                             <button class="reply-btn" data-id="{{ $comment->id }}">
                                 <div class="text-sm">Balas</div>
                             </button>
                         </div>
+
                     </div>
                     @else
                     <!-- Komentar Orang Lain -->
@@ -524,15 +576,20 @@
                         <p class="text-sm font-normal py-1">{{ $comment->comment }}</p>
                         <div class="flex items-center space-x-3 mt-2">
                             <button class="like-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-like text-lg"></i> {{ is_countable($comment->likes) ? $comment->likes->count() : 0 }}
+                                <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
                             </button>
+                            <span class="like-count">{{ $comment->likes->count() }}</span>
+
                             <button class="dislike-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-dislike text-lg"></i> {{ is_countable($comment->dislikes) ? $comment->dislikes->count() : 0 }}
+                                <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
                             </button>
+                            <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
+
                             <button class="reply-btn" data-id="{{ $comment->id }}">
                                 <div class="text-sm">Balas</div>
                             </button>
                         </div>
+
                     </div>
                     @endif
                 </div>
@@ -546,11 +603,27 @@
                             ? asset('storage/' . $reply->user->profile_photo_path) 
                             : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
                         <div class="flex flex-col text-white">
+
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm font-semibold text-white">{{ $reply->user->username }}</span>
                                 <span class="text-xs text-gray-400 pl-2">{{ $reply->created_at->diffForHumans() }}</span>
                             </div>
                             <span class="text-sm">{{ $reply->reply }}</span>
+                            <div class="flex items-center space-x-3 mt-2">
+                                <button class="like-btn" data-id="{{ $comment->id }}">
+                                    <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                                </button>
+                                <span class="like-count">{{ $comment->likes->count() }}</span>
+
+                                <button class="dislike-btn" data-id="{{ $comment->id }}">
+                                    <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                                </button>
+                                <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
+
+                                <button class="reply-btn" data-id="{{ $comment->id }}">
+                                    <div class="text-sm">Balas</div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @endforeach
@@ -608,7 +681,11 @@
                         if (data.success) {
                             alert('Rating berhasil dihapus!');
 
+                            // Menyembunyikan bintang rating setelah dihapus
                             document.getElementById('star-rating').style.display = 'block';
+
+                            // Refresh tampilan untuk menampilkan rating yang terbaru
+                            location.reload(); // Menyegarkan halaman untuk memperbarui tampilan
                         } else {
                             alert('Gagal menghapus rating!');
                         }
@@ -621,12 +698,70 @@
             });
 
 
+            //hover rating
+            const stars = document.querySelectorAll('#star-rating .empty-star');
+
+            stars.forEach((star, index) => {
+                // On hover
+                star.addEventListener('mouseenter', function() {
+                    highlightStars(index);
+                });
+
+                // Reset when mouse leaves
+                star.addEventListener('mouseleave', function() {
+                    resetStars();
+                });
+
+                // On click, select the stars and submit the rating
+                star.addEventListener('click', function() {
+                    selectStars(index);
+                });
+            });
+
+            // Function to highlight stars on hover
+            function highlightStars(index) {
+                stars.forEach((star, i) => {
+                    if (i <= index) {
+                        star.classList.add('selected');
+                    } else {
+                        star.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Function to reset stars when not hovering
+            function resetStars() {
+                stars.forEach(star => {
+                    star.classList.remove('selected');
+                });
+            }
+
+            // Function to select and submit the stars
+            function selectStars(index) {
+                document.getElementById('rating-value').value = index + 1;
+                stars.forEach((star, i) => {
+                    if (i <= index) {
+                        star.classList.add('selected');
+                    } else {
+                        star.classList.remove('selected');
+                    }
+                });
+            }
+
 
 
             // Rating
             document.querySelectorAll('#star-rating svg').forEach(star => {
                 star.addEventListener('click', function() {
                     const rating = this.getAttribute('data-value');
+                    // Hapus kelas 'active' dari semua bintang
+                    document.querySelectorAll('#star-rating svg').forEach(s => s.classList.remove('active'));
+                    // Tambahkan kelas 'active' untuk bintang yang dipilih dan semua bintang sebelumnya
+                    document.querySelectorAll('#star-rating svg').forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('active');
+                        }
+                    });
 
                     fetch('/video/{{ $detail->id }}/rate', {
                             method: 'POST',
@@ -643,54 +778,27 @@
                             if (data.message === 'Anda sudah memberikan rating untuk video ini.') {
                                 alert('Anda sudah memberikan rating untuk video ini.');
                             } else {
-                                alert(data.message);
+                                alert('Terima kasih atas rating Anda!');
 
                                 // Update rata-rata rating di tampilan
                                 const averageRatingElement = document.querySelector('.average-rating');
                                 if (averageRatingElement) {
-                                    averageRatingElement.textContent = data.averageRating.toFixed(2);
+                                    averageRatingElement.textContent = parseFloat(data.averageRating).toFixed(2);
                                 }
 
-                                // Update tampilan bintang
-                                const fullStars = Math.floor(data.averageRating);
-                                const halfStar = (data.averageRating - fullStars) >= 0.5;
-                                const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
-                                const starsContainer = document.getElementById('star-rating');
-                                starsContainer.innerHTML = ''; // Hapus bintang lama
-
-                                // Tambah bintang penuh
-                                for (let i = 0; i < fullStars; i++) {
-                                    starsContainer.innerHTML += `
-                        <svg class="w-4 h-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                        </svg>`;
-                                }
-
-                                // Tambah bintang setengah
-                                if (halfStar) {
-                                    starsContainer.innerHTML += `
-                        <svg class="w-4 h-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                            <path d="M11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                            <path d="M7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" fill="none" stroke="currentColor" stroke-width="1.5" />
-                        </svg>`;
-                                }
-
-                                // Tambah bintang kosong
-                                for (let i = 0; i < emptyStars; i++) {
-                                    starsContainer.innerHTML += `
-                        <svg class="w-4 h-4 text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                        </svg>`;
-                                }
-
-                                // Sembunyikan elemen star-rating setelah pengisian
-                                document.getElementById('star-rating').style.display = 'none';
+                                // Reload halaman setelah rating berhasil diberikan
+                                location.reload();
                             }
                         })
-                        .catch(error => console.error('Error:', error));
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Terjadi kesalahan saat mengirim rating.');
+                        });
                 });
             });
+
+
+
 
 
 
@@ -733,7 +841,7 @@
             });
 
 
-            //comment
+            // comment
             $('#comment-form').submit(function(event) {
                 event.preventDefault();
                 let formData = $(this).serialize();
@@ -746,21 +854,42 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        // Menghapus pesan "Belum ada komentar" jika ada
+                        $('.no-comments').remove();
+
                         const newComment = `
                 <div class="message flex items-start gap-2.5 mb-4 relative self-user">
-                    <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-blue-500 text-white rounded-s-xl rounded-se-xl">
+                    <img class="w-8 h-8 rounded-full" src="${response.profile_photo}" alt="Profile image">
+                    <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
                         <div class="flex items-center space-x-2 rtl:space-x-reverse">
                             <span class="text-sm font-semibold">${response.user_name}</span>
-                            <span class="text-sm font-normal">${response.created_at}</span>
+                            <span class="text-sm font-light">${response.created_at}</span>
                         </div>
-                        <p class="text-sm font-normal py-2.5">${response.comment}</p>
+                        <p class="text-sm font-light py-1">${response.comment}</p>
+                        <div class="flex items-center space-x-3 mt-2">
+                            <button class="like-btn" data-id="${response.comment_id}">
+                                <i class="bx bx-like text-lg"></i>
+                            </button>
+                            <span class="like-count">0</span>
+
+                            <button class="dislike-btn" data-id="${response.comment_id}">
+                                <i class="bx bx-dislike text-lg"></i>
+                            </button>
+                            <span class="dislike-count">0</span>
+
+                            <button class="reply-btn" data-id="${response.comment_id}">
+                                <div class="text-sm">Balas</div>
+                            </button>
+                        </div>
                     </div>
-                 <img class="w-8 h-8 rounded-full" src="https://www.shutterstock.com/image-photo/asian-man-wearing-traditional-javanese-260nw-2200692029.jpg" alt="Profile image">
                 </div>
             `;
 
                         $('#chat-messages').append(newComment);
                         $('#comment-form')[0].reset();
+
+                        // Refresh halaman setelah komentar dikirim
+                        location.reload(); // Tambahkan ini untuk refresh halaman
                     },
                     error: function(xhr) {
                         console.error('Gagal mengirim komentar:', xhr.statusText);
@@ -768,51 +897,81 @@
                 });
             });
 
-            $(document).ready(function() {
-                // Like comment
-                $('.like-btn').click(function() {
-                    let commentId = $(this).data('id');
-                    let url = `/comment/${commentId}/like`;
 
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.status === 'liked') {
-                                alert('Comment liked!');
-                            } else if (response.status === 'like removed') {
-                                alert('Like removed!');
-                            }
-                            location.reload(); // Optional: reload the page to update UI
+
+
+
+            // Untuk like button
+            $('.like-btn').on('click', function() {
+                let commentId = $(this).data('id');
+                let likeButton = $(this);
+                let dislikeButton = likeButton.closest('.message').find('.dislike-btn');
+                let likeCountSpan = likeButton.next('.like-count');
+                let dislikeCountSpan = dislikeButton.next('.dislike-count');
+
+                $.ajax({
+                    method: "POST",
+                    url: `/comment/${commentId}/like`,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+
+                        // Update UI untuk like
+                        if (response.status === 'liked') {
+                            likeButton.find('i').addClass('text-red-600');
+                            dislikeButton.find('i').removeClass('text-red-600'); // Hapus warna dislike jika ada
+                        } else {
+                            likeButton.find('i').removeClass('text-red-600');
                         }
-                    });
-                });
 
-                // Dislike comment
-                $('.dislike-btn').click(function() {
-                    let commentId = $(this).data('id');
-                    let url = `/comment/${commentId}/dislike`;
-
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.status === 'disliked') {
-                                alert('Comment disliked!');
-                            } else if (response.status === 'dislike removed') {
-                                alert('Dislike removed!');
-                            }
-                            location.reload(); // Optional: reload the page to update UI
-                        }
-                    });
+                        // Update jumlah like dan dislike
+                        likeCountSpan.text(response.likeCount);
+                        dislikeCountSpan.text(response.dislikeCount);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                    }
                 });
             });
+
+            // Untuk dislike button
+            $('.dislike-btn').on('click', function() {
+                let commentId = $(this).data('id');
+                let dislikeButton = $(this);
+                let likeButton = dislikeButton.closest('.message').find('.like-btn');
+                let dislikeCountSpan = dislikeButton.next('.dislike-count');
+                let likeCountSpan = likeButton.next('.like-count');
+
+                $.ajax({
+                    method: "POST",
+                    url: `/comment/${commentId}/dislike`,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+
+                        // Update UI untuk dislike
+                        if (response.status === 'disliked') {
+                            dislikeButton.find('i').addClass('text-red-600');
+                            likeButton.find('i').removeClass('text-red-600'); // Hapus warna like jika ada
+                        } else {
+                            dislikeButton.find('i').removeClass('text-red-600');
+                        }
+
+                        // Update jumlah like dan dislike
+                        dislikeCountSpan.text(response.dislikeCount);
+                        likeCountSpan.text(response.likeCount);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+
 
 
 
@@ -858,13 +1017,24 @@
                                     <div class="replies p-2 ml-12">
 
                     <div class="reply-item flex items-start gap-2.5 p-1 mb-1">
-                    <img class="w-6 h-6 rounded-full" src="https://www.shutterstock.com/image-photo/asian-man-wearing-traditional-javanese-260nw-2200692029.jpg" alt="Profile image">
+            <img class="w-6 h-6 rounded-full" src="${response.profile_photo_path ? response.profile_photo_path : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg'}" alt="Profile image">
                     <div class="flex flex-col text-white">
                         <div class="flex items-center justify-between py-2">
                             <span class="text-sm font-semibold text-white">${response.user_name}</span>
                             <span class="text-xs text-gray-400 pl-2">Baru saja</span>
                         </div>
                         <span class="text-sm">${response.reply}</span>
+                        <div class="flex items-center space-x-3 mt-2">
+                    <button class="like-btn" data-id="${response.reply_id}">
+                        <i class="bx bx-like text-lg"></i>
+                    </button>
+                    <span class="like-count">0</span> <!-- Ganti dengan logika jumlah like sesuai kebutuhan -->
+
+                    <button class="dislike-btn" data-id="${response.reply_id}">
+                        <i class="bx bx-dislike text-lg"></i>
+                    </button>
+                    <span class="dislike-count">0</span> <!-- Ganti dengan logika jumlah dislike sesuai kebutuhan -->
+                </div>
                     </div>
                 </div>
                 </div>

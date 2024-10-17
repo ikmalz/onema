@@ -28,11 +28,11 @@ class Comment extends Model
 
     public function likes()
     {
-        return $this->hasMany(LikeComment::class, 'comment_id');
+        return $this->hasMany(LikeComment::class);
     }
 
     public function dislikes()
     {
-        return $this->hasMany(DislikeComment::class, 'comment_id');
+        return $this->hasMany(DislikeComment::class);
     }
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('deskripsi');
             $table->string('vidio')->nullable();
             $table->string('poster');
+            $table->string('thumbnail');
             $table->integer('tahun');
             $table->string('populer');
             $table->timestamps();

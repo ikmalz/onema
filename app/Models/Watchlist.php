@@ -10,7 +10,6 @@ class Watchlist extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'trailer_id'];
-    protected $table = 'watchlist'; // Ganti dengan nama tabel yang sesuai
 
     public function user()
     {
@@ -19,7 +18,6 @@ class Watchlist extends Model
 
     public function trailer()
     {
-        return $this->belongsTo(Trailer::class);
+        return $this->belongsTo(Trailer::class, 'trailer_id');
     }
-    
 }

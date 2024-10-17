@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RegisterController; // Add this line to import the RegisterController
 use App\Models\Profile;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -21,8 +22,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/', [AuthController::class, 'auth'])->name('login');
+// routes/web.php
+
+Route::get('/', [HomeController::class, 'index'])->name('homepage'); // Tidak menggunakan middleware auth
 Route::post('postLogin', [AuthController::class, 'post'])->name('postLogin');
+
+Route::get('login', [AuthController::class, 'auth'])->name('login');
 
 // Register routes
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
@@ -38,9 +43,10 @@ Route::get('/detail/{id}', [HomeController::class, 'show'])->name('home.detail')
 Route::get('/home', [HomeController::class, 'index'])->name('home');
     
 Route::post('/trailer/{id}/comment', [HomeController::class, 'storeComment'])->name('comment.store');
-Route::post('comment/{id}/like', [HomeController::class, 'likeComment'])->name('comment.like');
-Route::post('comment/{id}/dislike', [HomeController::class, 'dislikeComment'])->name('comment.dislike');
 Route::post('/comment/{comment}/reply', [HomeController::class, 'storeReply'])->name('comment.reply');
+Route::post('/comment/{id}/like', [HomeController::class, 'toggleLikeComment'])->name('comment.like');
+Route::post('/comment/{id}/dislike', [HomeController::class, 'toggleDislikeComment'])->name('comment.dislike');
+
 
 Route::post('/video/{id}/like', [HomeController::class, 'likeVideo'])->name('video.like');
 Route::post('/video/{id}/dislike', [HomeController::class, 'dislikeVideo'])->name('video.dislike');
@@ -49,12 +55,29 @@ Route::post('/video/{id}/rate', [HomeController::class, 'rateVideo'])->name('vid
 Route::post('/video/{id}/delete-rating', [HomeController::class, 'deleteRating'])->name('video.delete-rating');
 
 Route::get('/watchlist', [HomeController::class, 'watchlist'])->name('watchlists');
-Route::post('/toggle-watchlist/{trailerId}', [HomeController::class, 'toggleWatchlist'])->name('toggle-watchlist');
-Route::post('/watchlist/toggle/{id}', [HomeController::class, 'toggleWatchlist'])->name('watchlist.toggle');
-Route::post('/toggle-watchlist/{id}', [HomeController::class, 'toggleWatchlist']);
+Route::post('/trailer/{id}/bookmark', [HomeController::class, 'toggleWatchlist'])->name('trailer.bookmark');
 
 Route::post('/switch-account/{accountId}', [AuthController::class, 'switchAccount'])->name('switch-account');
 Route::post('/update-profile-photo', [AuthController::class, 'updateProfilePhoto'])->name('update-profile-photo');
+Route::delete('/delete-profile-photo', [AuthController::class, 'deleteProfilePhoto'])->name('delete-profile-photo');
+Route::delete('/profile/photo', [AuthController::class, 'deleteProfilePhoto'])->name('delete-profile-photo');
+Route::post('/delete-profile-photo', [AuthController::class, 'deleteProfilePhoto'])->name('delete-profile-photo');
+
+Route::get('/lang/{lang}', function ($lang) {
+    App::setLocale($lang);
+    return response()->json([
+        'settings' => __('messages.settings'),
+        'select_language' => __('messages.select_language'),
+        'select_theme' => __('messages.select_theme'),
+        'save' => __('messages.save'),
+        'light' => __('messages.light'),
+        'dark' => __('messages.dark'),
+        'english' => __('messages.english'),
+        'indonesian' => __('messages.indonesian'),
+    ]);
+});
+
+Route::post('/change-language', [HomeController::class, 'changeLanguage'])->name('changeLanguage');
 
 
 
