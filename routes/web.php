@@ -46,6 +46,7 @@ Route::post('/trailer/{id}/comment', [HomeController::class, 'storeComment'])->n
 Route::post('/comment/{comment}/reply', [HomeController::class, 'storeReply'])->name('comment.reply');
 Route::post('/comment/{id}/like', [HomeController::class, 'toggleLikeComment'])->name('comment.like');
 Route::post('/comment/{id}/dislike', [HomeController::class, 'toggleDislikeComment'])->name('comment.dislike');
+Route::delete('/comments/{id}', [HomeController::class, 'deleteComment'])->name('comments.delete');
 
 
 Route::post('/video/{id}/like', [HomeController::class, 'likeVideo'])->name('video.like');

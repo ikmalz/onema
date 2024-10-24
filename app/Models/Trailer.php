@@ -50,7 +50,7 @@ class Trailer extends Model
     public function averageRating()
     {
         $ratings = $this->ratings()->avg('rating');
-        return $ratings ?: 0; // Jika tidak ada rating, kembalikan 0
+        return $ratings ?: 0; 
     }
 
     public function userRating()

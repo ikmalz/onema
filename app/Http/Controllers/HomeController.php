@@ -24,8 +24,10 @@ class HomeController extends Controller
         $slider = DB::table('_trailer')->inRandomOrder()->get();
         $recommendations = DB::table('_trailer')->inRandomOrder()->limit(3)->get();
         $topOnema = Trailer::withCount(['likes', 'dislikes'])
+            ->with('ratings') // Muat relasi rating
             ->orderBy('populer', 'desc')
             ->get();
+
 
         $availableAccounts = User::where('id', '!=', Auth::id())->get();
 
@@ -120,21 +122,25 @@ class HomeController extends Controller
     public function show($id)
     {
         $detail = Trailer::find($id);
-
+    
         if (!$detail) {
             return redirect()->back()->with('error', 'Data not found');
         }
-
+    
         $comments = Comment::where('trailer_id', $id)
             ->with(['replies', 'user', 'likes', 'dislikes'])
-            ->get();
-
+            ->get()
+            ->sortByDesc(function ($comment) {
+                return $comment->user_id == auth()->id() ? 1 : 0;
+            });
+    
         $userHasRated = Rating::where('user_id', auth()->id())
             ->where('trailer_id', $id)
             ->exists();
-
+    
         return view('home.detail', compact('detail', 'comments', 'userHasRated'));
     }
+    
 
 
 
@@ -165,6 +171,19 @@ class HomeController extends Controller
         }
 
         return redirect()->back()->with('success', 'Komentar berhasil ditambahkan.');
+    }
+
+    public function deleteComment($id)
+    {
+        $comment = Comment::find($id);
+
+        if (!$comment || $comment->user_id != Auth::id()) {
+            return response()->json(['error' => 'Tidak diizinkan atau komentar tidak ditemukan.'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json(['success' => 'Komentar berhasil dihapus.']);
     }
 
 
@@ -278,35 +297,35 @@ class HomeController extends Controller
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
         ]);
-    
+
         $trailer = Trailer::findOrFail($id);
         $user = Auth::user();
-    
+
         $existingRating = Rating::where('user_id', $user->id)
             ->where('trailer_id', $trailer->id)
             ->first();
-    
+
         if ($existingRating) {
             return response()->json([
                 'message' => 'Anda sudah memberikan rating untuk video ini.',
                 'averageRating' => $trailer->averageRating(),
             ]);
         }
-    
+
         Rating::create([
             'user_id' => $user->id,
             'trailer_id' => $trailer->id,
             'rating' => $request->rating,
         ]);
-    
+
         // Kembalikan rata-rata rating terbaru setelah rating berhasil
         return response()->json([
             'message' => 'Rating berhasil diberikan.',
             'averageRating' => $trailer->averageRating(),
         ]);
     }
-    
-    
+
+
     public function deleteRating(Request $request, $id)
     {
         $trailer = Trailer::findOrFail($id);

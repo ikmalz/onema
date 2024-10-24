@@ -7,6 +7,7 @@
   <title>Watchlist</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="icon" href="../asset/foto/logoonema.png" type="image/png">
   <style>
     .fade-in {
       transform: scale(0.8);

@@ -9,6 +9,7 @@
     <link rel="icon" href="../asset/foto/logoonema.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href='https://unpkg.com/boxicons/css/boxicons.min.css' rel='stylesheet'>
@@ -267,40 +268,30 @@
 
     #star-rating {
         display: flex;
-        flex-direction: row-reverse;
-        /* Membalikkan urutan bintang */
+        flex-direction: row;
     }
 
     #star-rating svg {
         position: relative;
-    }
-
-    #star-rating svg::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 50%;
-        height: 100%;
-        background: yellow;
-        clip-path: inset(0 0 0 0);
-        z-index: 1;
-    }
-
-    #star-rating svg path {
-        position: relative;
-        z-index: 0;
-    }
-
-    #star-rating svg {
         cursor: pointer;
-        transition: fill 0.2s ease;
+        transition: fill 0.3s ease;
+    }
+
+    #star-rating svg.selected {
+        fill: #FFD700;
+    }
+
+    #star-rating svg:hover~svg {
+        fill: #D3D3D3;
     }
 
     #star-rating svg:hover,
-    #star-rating svg.hovered {
+    #star-rating svg.selected {
         fill: #FFD700;
-        /* Warna kuning saat hover */
+    }
+
+    #star-rating svg:not(.selected) {
+        fill: #D3D3D3;
     }
 
     #delete-rating-icon {
@@ -310,6 +301,90 @@
         width: 16px;
         height: 16px;
         cursor: pointer;
+    }
+
+    .bg-gray-800 {
+        background-color: #2d3748;
+    }
+
+    .small-popup {
+        font-size: 14px;
+    }
+
+    .popup-title {
+        font-weight: bold;
+        color: #d33;
+    }
+
+    .popup-content {
+        color: #e2e8f0;
+    }
+
+    .confirm-btn {
+        background-color: #d33 !important;
+        border-color: #d33 !important;
+    }
+
+    .cancel-btn {
+        background-color: #808080 !important;
+        border-color: #808080 !important;
+    }
+
+    .popup-text {
+        color: #ddd;
+    }
+
+    .bg-gray-800 {
+        background-color: #2d3748;
+    }
+
+    /* perbatasan */
+
+    .small-popup {
+        font-size: 14px;
+    }
+
+    .popup-title {
+        font-weight: bold;
+        color: #d33;
+    }
+
+    .popup-content {
+        color: #e2e8f0;
+    }
+
+    .confirm-btn {
+        background-color: #d33 !important;
+        border-color: #d33 !important;
+    }
+
+    .cancel-btn {
+        background-color: #808080 !important;
+        border-color: #808080 !important;
+    }
+
+    /* rating */
+
+    .bg-gray-800 {
+        background-color: #2d3748;
+    }
+
+    .small-popup {
+        font-size: 14px;
+    }
+
+    .popup-title {
+        font-weight: bold;
+        color: #d33;
+    }
+
+    .popup-content {
+        color: #e2e8f0;
+    }
+
+    .confirm-btn {
+        background-color: #d33 !important;
+        border-color: #d33 !important;
     }
 </style>
 
@@ -388,192 +463,243 @@
     </section>
 
     <!-- Section for Background Content -->
-    <section class="max-w-screen-lg mx-auto p-3 mt-8">
-        <!-- Background Section -->
-        <div id="background-container" class="w-full max-w-3xl mx-auto text-white px-6 py-12 rounded-t-lg bg-gray-800 flex flex-col md:flex-row">
+    <div id="background-container" class="w-full max-w-3xl mx-auto text-white px-6 py-12 rounded-t-lg bg-gray-800 flex flex-col md:flex-row">
+        <!-- Poster Section -->
+        <div class="w-full md:w-1/2 mb-4 md:mb-0">
+            <img src="{{ asset('upload/' . $detail->poster) }}" alt="Poster Image" class="rounded-lg w-full h-auto object-cover" style="max-height: 500px; object-fit: cover;">
+        </div>
 
-            <!-- Poster Section -->
-            <div class="w-full md:w-1/2 mb-4 md:mb-0">
-                <img src="{{ asset('upload/' . $detail->poster) }}" alt="Poster Image" class="rounded-lg w-full h-auto object-cover" style="max-height: 500px; object-fit: cover;">
+        <!-- Content Section -->
+        <div class="flex-grow mt-4 md:mt-0 md:ml-6 flex flex-col justify-start">
+            <!-- Title and Genre Section -->
+            <div class="mb-4">
+                <h2 class="text-3xl md:text-4xl font-bold mb-2">{{$detail->title}}</h2>
+                <p class="text-sm text-gray-400 mb-1">Tanggal Publish: {{$detail->tahun}}</p>
+                <p class="text-sm text-gray-400 mb-1">Genre: {{$detail->populer}}</p>
             </div>
 
-            <!-- Content Section -->
-            <div class="flex-grow mt-4 md:mt-0 md:ml-6 flex flex-col justify-center">
-                <div class="md:mb-4">
-                    <h2 class="text-4xl font-bold mb-2">{{$detail->title}}</h2>
-                    <p class="text-sm mb-1">Tanggal Publish: {{$detail->tahun}}</p>
-                    <p class="text-sm mb-1">Genre: {{$detail->populer}}</p>
-                    <div class="bg-gray-800 pl-7 pr-8 py-4 w-full max-w-3xl mx-auto">
-                        <hr class="border-gray-600 my-4">
-                        <div class="flex items-center justify-between">
-                            <p class="text-xl text-justify text-white font-bold pb-1">Rating</p>
+            <div class="bg-gray-900 pl-7 pr-8 py-4 w-full max-w-3xl mx-auto rounded-md">
+                <hr class="border-gray-600 my-4">
+                <div class="flex items-center justify-between">
+                    <p class="text-xl text-justify text-white font-bold pb-1">Rating</p>
 
-                            <!-- Icon titik tiga (ellipsis) -->
-                            <div class="relative">
-                                <button id="ellipsis-btn" class="text-white focus:outline-none">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 10.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5zM6 10.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5zM18 10.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5z" />
-                                    </svg>
-                                </button>
+                    <!-- Icon titik tiga (ellipsis) -->
+                    <div class="relative">
+                        <button id="ellipsis-btn" class="text-white focus:outline-none">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 10.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5zM6 10.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5zM18 10.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5z" />
+                            </svg>
+                        </button>
 
-                                <!-- Tombol Hapus di Pop-up -->
-                                <div id="popup-menu" class="absolute right-0 mt-2 w-24 bg-white text-black rounded-md shadow-lg hidden z-50">
-                                    <ul>
-                                        <li>
-                                            <button id="delete-rating-btn" class="w-full px-4 py-2 text-left hover:bg-red-500 hover:rounded-md hover:text-white">
-                                                Hapus
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <!-- Tombol Hapus di Pop-up -->
+                        <div id="popup-menu" class="absolute right-0 mt-2 w-24 bg-white text-black rounded-md shadow-lg hidden z-50">
+                            <ul>
+                                <li>
+                                    <button id="delete-rating-btn" class="w-full px-4 py-2 text-left hover:bg-red-500 hover:rounded-md hover:text-white">
+                                        Hapus
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
-
-                        <!-- Rating Stars -->
-                        <!-- Bintang Rating -->
-                        <div class="flex items-center text-white">
-                            @php
-                            $averageRating = $detail->averageRating(); // Menghitung rata-rata rating
-                            $fullStars = floor($averageRating); // Bintang penuh
-                            $halfStar = $averageRating - $fullStars >= 0.5 ? true : false; // Setengah bintang
-                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Bintang kosong
-                            @endphp
-
-                            <!-- Tampilkan bintang penuh -->
-                            @for ($i = 0; $i < $fullStars; $i++)
-                                <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                </svg>
-                                @endfor
-
-                                <!-- Tampilkan setengah bintang (jika ada) -->
-                                @if ($halfStar)
-                                <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    <path d="M7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" fill="none" stroke="currentColor" stroke-width="1.5" />
-                                </svg>
-                                @endif
-
-                                <!-- Tampilkan bintang kosong -->
-                                @for ($i = 0; $i < $emptyStars; $i++)
-                                    <svg class="w-4 h-4 text-gray-300 me-1 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    </svg>
-                                    @endfor
-
-                                    <!-- Tampilkan nilai rating -->
-                                    <div class="flex items-center text-white">
-                                        <p class="average-rating">{{ number_format($averageRating, 2) }}</p>
-                                        <p class="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">out of 5</p>
-                                    </div>
-                        </div>
-
-
-                        <!-- Bintang rating jika user belum memberikan rating -->
-                        @if (auth()->check() && !$userHasRated)
-                        <div id="star-rating" class="flex items-center my-2">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <svg data-value="{{ $i }}" class="w-8 h-8 text-gray-400 cursor-pointer empty-star hover:text-yellow-300 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <defs>
-                                    <linearGradient id="grad{{ $i }}" x1="0%" y1="0%" x2="100%">
-                                        <stop offset="0%" style="stop-color:yellow;stop-opacity:1" />
-                                        <stop offset="0%" style="stop-color:gray;stop-opacity:1" />
-                                    </linearGradient>
-                                </defs>
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.67 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
-                                </svg>
-                                @endfor
-                        </div>
-                        @elseif(auth()->guest())
-                        <p class="text-gray-400">Login untuk memberikan rating.</p>
-                        @endif
-
-                        <!-- Hidden Form -->
-                        <form id="rating-form" action="{{ route('video.rate', $detail->id) }}" method="POST" class="hidden">
-                            @csrf
-                            <input type="hidden" name="rating" id="rating-value">
-                        </form>
-
-                        <hr class="border-gray-600 my-4">
                     </div>
                 </div>
+
+                <!-- Rating Stars -->
+                <div class="flex items-center text-white">
+                    @php
+                    $averageRating = $detail->averageRating(); // Menghitung rata-rata rating
+                    $fullStars = floor($averageRating); // Bintang penuh
+                    $halfStar = $averageRating - $fullStars >= 0.5 ? true : false; // Setengah bintang
+                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Bintang kosong
+                    @endphp
+
+                    <!-- Tampilkan bintang penuh -->
+                    @for ($i = 0; $i < $fullStars; $i++)
+                        <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                        </svg>
+                        @endfor
+
+                        @if ($halfStar)
+                        <svg class="w-4 h-4 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <defs>
+                                <linearGradient id="halfStarGradient">
+                                    <stop offset="50%" stop-color="#FFD700" />
+                                    <stop offset="50%" stop-color="gray" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" fill="url(#halfStarGradient)" />
+                        </svg>
+                        @endif
+
+                        <!-- Tampilkan bintang kosong -->
+                        @for ($i = 0; $i < $emptyStars; $i++)
+                            <svg class="w-4 h-4 text-gray-300 me-1 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                            </svg>
+                            @endfor
+
+                            <!-- Tampilkan nilai rating -->
+                            <div class="flex items-center text-white">
+                                <p class="average-rating">{{ number_format($averageRating, 2) }}</p>
+                                <p class="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">out of 5</p>
+                            </div>
+                </div>
+
+
+                <!-- Bintang rating jika user belum memberikan rating -->
+                @if (auth()->check() && !$userHasRated)
+                <div id="star-rating" class="flex items-center my-2">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <svg data-value="{{ $i }}" class="w-8 h-8 text-gray-400 cursor-pointer empty-star hover:text-yellow-300 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <defs>
+                            <linearGradient id="grad{{ $i }}" x1="0%" y1="0%" x2="100%">
+                                <stop offset="0%" style="stop-color:yellow;stop-opacity:1" />
+                                <stop offset="0%" style="stop-color:gray;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.67 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+                        </svg>
+                        @endfor
+                </div>
+                @elseif(auth()->guest())
+                <p class="text-gray-400">Login untuk memberikan rating.</p>
+                @endif
+
+                <!-- Hidden Form -->
+                <form id="rating-form" action="{{ route('video.rate', $detail->id) }}" method="POST" class="hidden">
+                    @csrf
+                    <input type="hidden" name="rating" id="rating-value">
+                </form>
+
+                <hr class="border-gray-600 my-4">
             </div>
-
         </div>
+    </div>
 
-        <!-- Deskripsi Section -->
-        <div class="bg-gray-800 pl-7 pr-8 py-4 w-full max-w-3xl mx-auto ">
-            <hr class="border-gray-600 my-4">
-            <p class="text-xl text-justify text-white font-bold pb-1">Sinopsis</p>
-            <div id="sinopsis-container" class="text-wrap text-sm text-justify text-white overflow-hidden" style="max-height: 100px;">
-                @foreach (explode("\n", $detail->deskripsi) as $paragraph)
-                <p class="paragraph">{{ $paragraph }}</p>
-                @endforeach
-            </div>
-            <button id="toggle-sinopsis" class="text-red-600 hover:underline mt-1">Selengkapnya</button>
-            <hr class="border-gray-600 my-4">
+    </div>
+
+    <!-- Deskripsi Section -->
+    <div class="bg-gray-800 pl-7 pr-8 py-4 w-full max-w-3xl mx-auto ">
+        <hr class="border-gray-600 my-4">
+        <p class="text-xl text-justify text-white font-bold pb-1">Sinopsis</p>
+        <div id="sinopsis-container" class="text-wrap text-sm text-justify text-white overflow-hidden" style="max-height: 100px;">
+            @foreach (explode("\n", $detail->deskripsi) as $paragraph)
+            <p class="paragraph">{{ $paragraph }}</p>
+            @endforeach
         </div>
+        <button id="toggle-sinopsis" class="text-red-600 hover:underline mt-1">Selengkapnya</button>
+        <hr class="border-gray-600 my-4">
+    </div>
 
-        <!-- Chat Section -->
-        <div id="chat-container" class="w-full max-w-3xl mx-auto bg-black p-4 rounded-b-lg flex flex-col h-full bg-[linear-gradient(to_bottom,_rgba(31,41,55,1)_0%,_rgba(31,41,55,0)_40%)]">
-            <h3 class="text-xl font-semibold mb-4 text-white">Komentar</h3>
+    <!-- Chat Section -->
+    <div id="chat-container" class="w-full max-w-3xl mx-auto bg-black p-4 rounded-b-lg flex flex-col h-full bg-[linear-gradient(to_bottom,_rgba(31,41,55,1)_0%,_rgba(31,41,55,0)_40%)]">
+        <h3 class="text-xl font-semibold mb-4 text-white">Komentar</h3>
 
-            @auth
-            <form id="comment-form" action="{{ route('comment.store', $detail->id) }}" method="POST" class="flex items-center mb-4">
-                @csrf
-                <input type="text" name="comment" placeholder="Tulis komentar..." class="flex-grow py-2 px-3 border-b-2 border-gray-500 bg-transparent text-white focus:border-red-700 focus:outline-none placeholder-gray-400" required>
-                <button type="submit" class="ml-4 p-2 bg-red-700 text-white rounded-lg hover:bg-red-800 focus:ring focus:ring-red-500 focus:ring-opacity-50">Kirim</button>
-            </form>
-            @else
-            <p class="text-gray-400 py-5">Login untuk menulis komentar.</p>
-            @endauth
+        @auth
+        <form id="comment-form" action="{{ route('comment.store', $detail->id) }}" method="POST" class="flex items-center mb-4">
+            @csrf
+            <input type="text" name="comment" placeholder="Tulis komentar..." class="flex-grow py-2 px-3 border-b-2 border-gray-500 bg-transparent text-white focus:border-red-700 focus:outline-none placeholder-gray-400" required>
+            <button type="submit" class="ml-4 p-2 bg-red-700 text-white rounded-lg hover:bg-red-800 focus:ring focus:ring-red-500 focus:ring-opacity-50">Kirim</button>
+        </form>
+        @else
+        <p class="text-gray-400 py-5">Login untuk menulis komentar.</p>
+        @endauth
 
 
-            <!-- Chat Messages -->
-            <div id="chat-messages" class="text-left flex-grow overflow-y-auto max-h-[300px]">
-                @if($comments && $comments->count() > 0)
-                @foreach ($comments as $comment)
-                <!-- Komentar Utama -->
-                <div class="message flex items-start gap-2.5 mb-4 relative {{ $comment->user_id == auth()->id() ? 'self-user' : 'other-user' }}" data-id="{{ $comment->id }}">
-                    @if ($comment->user_id == auth()->id())
-                    <!-- Komentar Sendiri -->
-                    <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_path 
-                            ? asset('storage/' . Auth::user()->profile_photo_path) 
-                            : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
-                    <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
-                        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="text-left flex-grow overflow-y-auto max-h-[300px]">
+            @if($comments && $comments->count() > 0)
+            @foreach ($comments as $comment)
+            <!-- Komentar Utama -->
+            <div class="message flex items-start gap-2.5 mb-4 relative {{ $comment->user_id == auth()->id() ? 'self-user' : 'other-user' }}" data-id="{{ $comment->id }}">
+                @if ($comment->user_id == auth()->id())
+                <!-- Komentar Sendiri -->
+                <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_path 
+                ? asset('storage/' . Auth::user()->profile_photo_path) 
+                : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
+                <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
+                    <div class="flex items-center justify-between space-x-2 rtl:space-x-reverse">
+                        <div class="flex items-center space-x-2">
                             <span class="text-sm font-semibold">Anda</span>
                             <span class="text-sm font-light">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
-                        <p class="text-sm font-light py-1">{{ $comment->comment }}</p>
-                        <div class="flex items-center space-x-3 mt-2">
-                            <button class="like-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                        <div class="relative">
+                            <!-- Ikon titik tiga -->
+                            <button id="menu-button-{{ $comment->id }}" class="focus:outline-none">
+                                <i class="bx bx-dots-vertical-rounded text-lg"></i>
                             </button>
-                            <span class="like-count">{{ $comment->likes->count() }}</span>
-
-                            <button class="dislike-btn" data-id="{{ $comment->id }}">
-                                <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
-                            </button>
-                            <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
-
-                            <button class="reply-btn" data-id="{{ $comment->id }}">
-                                <div class="text-sm">Balas</div>
-                            </button>
+                            <!-- Dropdown menu -->
+                            <div id="dropdown-{{ $comment->id }}" class="hidden absolute right-0 mt-2 w-32 bg-white text-black rounded-lg shadow-lg">
+                                <a href="#" class="block px-4 py-2 text-sm hover:bg-red-500 hover:text-white hover:rounded-lg delete-comment" data-id="{{ $comment->id }}">Delete</a>
+                            </div>
                         </div>
 
+
                     </div>
-                    @else
-                    <!-- Komentar Orang Lain -->
-                    <img class="w-8 h-8 rounded-full" src="{{ $comment->user->profile_photo_path 
+                    <p class="text-sm font-light py-1">{{ $comment->comment }}</p>
+                    <div class="flex items-center space-x-3 mt-2">
+                        <button class="like-btn" data-id="{{ $comment->id }}">
+                            <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                        </button>
+                        <span class="like-count">{{ $comment->likes->count() }}</span>
+
+                        <button class="dislike-btn" data-id="{{ $comment->id }}">
+                            <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                        </button>
+                        <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
+
+                        <button class="reply-btn" data-id="{{ $comment->id }}">
+                            <div class="text-sm">Balas</div>
+                        </button>
+                    </div>
+                </div>
+                @else
+                <!-- Komentar Orang Lain -->
+                <img class="w-8 h-8 rounded-full" src="{{ $comment->user->profile_photo_path 
                             ? asset('storage/' . $comment->user->profile_photo_path) 
                             : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
-                    <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
-                        <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                            <span class="text-sm font-light">@ {{ $comment->user->username }}</span>
-                            <span class="text-sm font-light">{{ $comment->created_at->diffForHumans() }}</span>
+                <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-2 bg-transparent text-white">
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                        <span class="text-sm font-light">@ {{ $comment->user->username }}</span>
+                        <span class="text-sm font-light">{{ $comment->created_at->diffForHumans() }}</span>
+                    </div>
+                    <p class="text-sm font-normal py-1">{{ $comment->comment }}</p>
+                    <div class="flex items-center space-x-3 mt-2">
+                        <button class="like-btn" data-id="{{ $comment->id }}">
+                            <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                        </button>
+                        <span class="like-count">{{ $comment->likes->count() }}</span>
+
+                        <button class="dislike-btn" data-id="{{ $comment->id }}">
+                            <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
+                        </button>
+                        <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
+
+                        <button class="reply-btn" data-id="{{ $comment->id }}">
+                            <div class="text-sm">Balas</div>
+                        </button>
+                    </div>
+
+                </div>
+                @endif
+            </div>
+
+            <!-- Balasan Komentar -->
+            @if($comment->replies && $comment->replies->count() > 0)
+            <div class="replies p-2 ml-12">
+                @foreach ($comment->replies as $reply)
+                <div class="reply-item flex items-start gap-2.5 p-1 mb-1">
+                    <img class="w-6 h-6 rounded-full" src="{{ $reply->user->profile_photo_path 
+                            ? asset('storage/' . $reply->user->profile_photo_path) 
+                            : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
+                    <div class="flex flex-col text-white">
+
+                        <div class="flex items-center justify-between py-2">
+                            <span class="text-sm font-semibold text-white">{{ $reply->user->username }}</span>
+                            <span class="text-xs text-gray-400 pl-2">{{ $reply->created_at->diffForHumans() }}</span>
                         </div>
-                        <p class="text-sm font-normal py-1">{{ $comment->comment }}</p>
+                        <span class="text-sm">{{ $reply->reply }}</span>
                         <div class="flex items-center space-x-3 mt-2">
                             <button class="like-btn" data-id="{{ $comment->id }}">
                                 <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
@@ -589,62 +715,27 @@
                                 <div class="text-sm">Balas</div>
                             </button>
                         </div>
-
                     </div>
-                    @endif
                 </div>
-
-                <!-- Balasan Komentar -->
-                @if($comment->replies && $comment->replies->count() > 0)
-                <div class="replies p-2 ml-12">
-                    @foreach ($comment->replies as $reply)
-                    <div class="reply-item flex items-start gap-2.5 p-1 mb-1">
-                        <img class="w-6 h-6 rounded-full" src="{{ $reply->user->profile_photo_path 
-                            ? asset('storage/' . $reply->user->profile_photo_path) 
-                            : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}" alt="Profile image">
-                        <div class="flex flex-col text-white">
-
-                            <div class="flex items-center justify-between py-2">
-                                <span class="text-sm font-semibold text-white">{{ $reply->user->username }}</span>
-                                <span class="text-xs text-gray-400 pl-2">{{ $reply->created_at->diffForHumans() }}</span>
-                            </div>
-                            <span class="text-sm">{{ $reply->reply }}</span>
-                            <div class="flex items-center space-x-3 mt-2">
-                                <button class="like-btn" data-id="{{ $comment->id }}">
-                                    <i class="bx bx-like text-lg {{ $comment->likes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
-                                </button>
-                                <span class="like-count">{{ $comment->likes->count() }}</span>
-
-                                <button class="dislike-btn" data-id="{{ $comment->id }}">
-                                    <i class="bx bx-dislike text-lg {{ $comment->dislikes->contains('user_id', auth()->id()) ? 'text-red-600' : '' }}"></i>
-                                </button>
-                                <span class="dislike-count">{{ $comment->dislikes->count() }}</span>
-
-                                <button class="reply-btn" data-id="{{ $comment->id }}">
-                                    <div class="text-sm">Balas</div>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-
-                <div class="reply-form hidden mt-2" id="reply-form-{{ $comment->id }}">
-                    <form class="flex items-center w-full mb-2 reply-form" data-id="{{ $comment->id }}">
-                        @csrf
-                        <input type="text" name="reply" placeholder="Tulis balasan..." class="flex-grow py-2 px-3 border-b-2 border-gray-500 bg-transparent text-white focus:border-red-700 reply-input">
-                        <button type="submit" class="ml-4 p-2 bg-red-700 text-white rounded-lg hover:bg-red-800 focus:ring-red-700 send-reply-btn" data-id="{{ $comment->id }}">Kirim</button>
-                        <button type="button" class="ml-2 p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 cancel-reply-btn" data-id="{{ $comment->id }}">Batal</button>
-                    </form>
-                </div>
-
                 @endforeach
-                @else
-                <p class="text-white">Belum ada komentar.</p>
-                @endif
             </div>
+            @endif
+
+            <div class="reply-form hidden mt-2" id="reply-form-{{ $comment->id }}">
+                <form class="flex items-center w-full mb-2 reply-form" data-id="{{ $comment->id }}">
+                    @csrf
+                    <input type="text" name="reply" placeholder="Tulis balasan..." class="flex-grow py-2 px-3 border-b-2 border-gray-500 bg-transparent text-white focus:border-red-700 reply-input">
+                    <button type="submit" class="ml-4 p-2 bg-red-700 text-white rounded-lg hover:bg-red-800 focus:ring-red-700 send-reply-btn" data-id="{{ $comment->id }}">Kirim</button>
+                    <button type="button" class="ml-2 p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 cancel-reply-btn" data-id="{{ $comment->id }}">Batal</button>
+                </form>
+            </div>
+
+            @endforeach
+            @else
+            <p class="text-white">Belum ada komentar.</p>
+            @endif
         </div>
+    </div>
 
     </section>
 
@@ -667,38 +758,173 @@
                 }
             });
 
-            // Hapus Rating
-            document.getElementById('delete-rating-btn').addEventListener('click', function() {
-                fetch('/video/{{ $detail->id }}/delete-rating', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            // Tampilkan atau sembunyikan dropdown saat ikon titik tiga diklik
+            document.querySelectorAll('[id^="menu-button-"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    let dropdown = document.querySelector('#dropdown-' + this.id.split('-')[2]);
+                    dropdown.classList.toggle('hidden');
+                });
+            });
+
+            // Simpan data history ke localStorage
+            const historyData = {
+                title: document.querySelector('h2').textContent,
+                poster: '{{ asset("upload/" . $detail->poster) }}', // Menggunakan asset untuk mendapatkan URL poster
+                genre: document.querySelector('.text-gray-400').textContent,
+                year: document.querySelectorAll('.text-gray-400')[1].textContent,
+                timestamp: Date.now() // Menyimpan timestamp
+            };
+
+            // Dapatkan history sebelumnya
+            let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
+
+            // Tambahkan data baru ke history
+            savedHistory.push(historyData);
+
+            // Simpan kembali ke localStorage
+            localStorage.setItem('videoHistory', JSON.stringify(savedHistory));
+
+
+            // Hapus komentar
+            document.querySelectorAll('.delete-comment').forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const commentId = this.getAttribute('data-id');
+
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: "Anda tidak dapat mengembalikan komentar ini!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#808080',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal',
+                        width: '300px',
+                        customClass: {
+                            popup: 'small-popup bg-gray-800',
+                            title: 'popup-title',
+                            content: 'popup-content',
+                            text: 'popup-text',
+                            confirmButton: 'confirm-btn',
+                            cancelButton: 'cancel-btn'
                         }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Rating berhasil dihapus!');
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/comments/' + commentId,
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        title: 'Dihapus!',
+                                        text: 'Komentar berhasil dihapus.',
+                                        icon: 'success',
+                                        confirmButtonColor: '#d33',
+                                        width: '300px',
+                                        customClass: {
+                                            popup: 'small-popup bg-gray-800',
+                                            title: 'popup-title',
+                                            content: 'popup-content',
+                                            confirmButton: 'confirm-btn'
+                                        }
+                                    });
 
-                            // Menyembunyikan bintang rating setelah dihapus
-                            document.getElementById('star-rating').style.display = 'block';
-
-                            // Refresh tampilan untuk menampilkan rating yang terbaru
-                            location.reload(); // Menyegarkan halaman untuk memperbarui tampilan
-                        } else {
-                            alert('Gagal menghapus rating!');
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 2000);
+                                },
+                                error: function(xhr) {
+                                    console.error('Gagal menghapus komentar:', xhr.statusText);
+                                }
+                            });
                         }
-
-                        // Sembunyikan pop-up
-                        var popup = document.getElementById('popup-menu');
-                        popup.classList.add('hidden');
-                    })
-                    .catch(error => console.error('Error:', error));
+                    });
+                });
             });
 
 
-            //hover rating
+
+
+            // Hapus Rating
+            document.getElementById('delete-rating-btn').addEventListener('click', function() {
+                // SweetAlert untuk konfirmasi penghapusan rating
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Anda akan menghapus rating ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33', // Warna tombol konfirmasi (merah)
+                    cancelButtonColor: '#808080', // Warna tombol batal (abu-abu)
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal',
+                    width: '300px', // Menyusutkan ukuran popup
+                    customClass: {
+                        popup: 'small-popup bg-gray-800', // Tambahkan class kustom untuk styling background
+                        title: 'popup-title',
+                        content: 'popup-content',
+                        confirmButton: 'confirm-btn',
+                        cancelButton: 'cancel-btn'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/video/{{ $detail->id }}/delete-rating', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Dihapus!',
+                                        text: 'Rating berhasil dihapus!',
+                                        icon: 'success',
+                                        confirmButtonColor: '#d33',
+                                        width: '300px',
+                                        customClass: {
+                                            popup: 'small-popup bg-gray-800', // Menambahkan class latar belakang di sini juga
+                                            title: 'popup-title',
+                                            content: 'popup-content',
+                                            confirmButton: 'confirm-btn'
+                                        }
+                                    });
+
+                                    // Refresh tampilan untuk menampilkan rating yang terbaru
+                                    setTimeout(function() {
+                                        location.reload(); // Menyegarkan halaman untuk memperbarui tampilan
+                                    }, 2000);
+                                } else {
+                                    Swal.fire({
+                                        title: 'Gagal!',
+                                        text: data.message,
+                                        icon: 'error',
+                                        confirmButtonColor: '#d33',
+                                        width: '300px',
+                                        customClass: {
+                                            popup: 'small-popup bg-gray-800',
+                                            title: 'popup-title',
+                                            content: 'popup-content',
+                                            confirmButton: 'confirm-btn'
+                                        }
+                                    });
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+
+
+
+
+            // Hover rating
+            let selectedRating = 0; // Variabel untuk menyimpan nilai rating yang diklik
+
             const stars = document.querySelectorAll('#star-rating .empty-star');
 
             stars.forEach((star, index) => {
@@ -709,19 +935,24 @@
 
                 // Reset when mouse leaves
                 star.addEventListener('mouseleave', function() {
-                    resetStars();
+                    if (selectedRating === 0) { // Jika belum ada rating yang dipilih, reset saat mouse leave
+                        resetStars();
+                    } else {
+                        selectStars(selectedRating - 1); // Pastikan bintang yang diklik tetap ter-highlight
+                    }
                 });
 
-                // On click, select the stars and submit the rating
+                // On click, select the stars and lock the rating
                 star.addEventListener('click', function() {
                     selectStars(index);
+                    selectedRating = index + 1; // Simpan rating yang dipilih
                 });
             });
 
             // Function to highlight stars on hover
             function highlightStars(index) {
                 stars.forEach((star, i) => {
-                    if (i <= index) {
+                    if (i <= index) { // Highlight dari kiri ke kanan
                         star.classList.add('selected');
                     } else {
                         star.classList.remove('selected');
@@ -736,11 +967,14 @@
                 });
             }
 
-            // Function to select and submit the stars
+            // Function to select and lock the stars when clicked
             function selectStars(index) {
-                document.getElementById('rating-value').value = index + 1;
+                selectedRating = index + 1; // Simpan nilai rating yang diklik
+                document.getElementById('rating-value').value = selectedRating; // Set nilai form
+
+                // Highlight bintang yang dipilih secara permanen
                 stars.forEach((star, i) => {
-                    if (i <= index) {
+                    if (i <= index) { // Highlight semua bintang hingga yang dipilih
                         star.classList.add('selected');
                     } else {
                         star.classList.remove('selected');
@@ -750,20 +984,28 @@
 
 
 
+
+
             // Rating
             document.querySelectorAll('#star-rating svg').forEach(star => {
                 star.addEventListener('click', function() {
-                    const rating = this.getAttribute('data-value');
+                    const rating = parseInt(this.getAttribute('data-value')); // Ambil nilai bintang yang diklik
+
                     // Hapus kelas 'active' dari semua bintang
                     document.querySelectorAll('#star-rating svg').forEach(s => s.classList.remove('active'));
-                    // Tambahkan kelas 'active' untuk bintang yang dipilih dan semua bintang sebelumnya
-                    document.querySelectorAll('#star-rating svg').forEach((s, index) => {
-                        if (index < rating) {
+
+                    // Tambahkan kelas 'active' untuk bintang yang dipilih dan semua bintang sebelumnya (dari kiri ke kanan)
+                    document.querySelectorAll('#star-rating svg').forEach(s => {
+                        if (parseInt(s.getAttribute('data-value')) <= rating) {
                             s.classList.add('active');
                         }
                     });
 
-                    fetch('/video/{{ $detail->id }}/rate', {
+                    // Atur nilai rating ke dalam form tersembunyi
+                    document.getElementById('rating-value').value = rating;
+
+                    // Kirim data rating ke server menggunakan fetch
+                    fetch(`/video/{{ $detail->id }}/rate`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -776,9 +1018,33 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.message === 'Anda sudah memberikan rating untuk video ini.') {
-                                alert('Anda sudah memberikan rating untuk video ini.');
+                                Swal.fire({
+                                    title: 'Peringatan!',
+                                    text: 'Anda sudah memberikan rating untuk video ini.',
+                                    icon: 'warning',
+                                    confirmButtonColor: '#808080',
+                                    width: '300px',
+                                    customClass: {
+                                        popup: 'small-popup bg-gray-800',
+                                        title: 'popup-title',
+                                        content: 'popup-content',
+                                        confirmButton: 'confirm-btn'
+                                    }
+                                });
                             } else {
-                                alert('Terima kasih atas rating Anda!');
+                                Swal.fire({
+                                    title: 'Terima kasih!',
+                                    text: 'Rating berhasil diberikan.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#d33',
+                                    width: '300px',
+                                    customClass: {
+                                        popup: 'small-popup bg-gray-800',
+                                        title: 'popup-title',
+                                        content: 'popup-content',
+                                        confirmButton: 'confirm-btn'
+                                    }
+                                });
 
                                 // Update rata-rata rating di tampilan
                                 const averageRatingElement = document.querySelector('.average-rating');
@@ -787,12 +1053,26 @@
                                 }
 
                                 // Reload halaman setelah rating berhasil diberikan
-                                location.reload();
+                                setTimeout(function() {
+                                    location.reload(); // Menyegarkan halaman untuk memperbarui tampilan
+                                }, 2000);
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('Terjadi kesalahan saat mengirim rating.');
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan saat mengirim rating.',
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                width: '300px',
+                                customClass: {
+                                    popup: 'small-popup bg-gray-800',
+                                    title: 'popup-title',
+                                    content: 'popup-content',
+                                    confirmButton: 'confirm-btn'
+                                }
+                            });
                         });
                 });
             });
@@ -1066,7 +1346,6 @@
                 durationLabel.textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
             });
 
-            //rating
 
         });
     </script>

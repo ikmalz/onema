@@ -8,6 +8,7 @@
     <link rel="icon" href="../asset/foto/logoonema.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -181,7 +182,7 @@
             background-color: #333;
             transition: left 0.5s ease-in-out;
             z-index: 1000;
-            border-radius: 0px 15px 15px 0px;
+            border-radius: 0px 5px 5px 0px;
             overflow-y: auto;
         }
 
@@ -712,6 +713,81 @@
         .modal-hide {
             animation: modalFadeOut 0.3s forwards;
         }
+
+        #notificationModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        #notificationModal.active {
+            display: flex;
+        }
+
+        #notificationModal .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        #historyModal {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 1500;
+        }
+
+        #historyModal:not(.hidden) {
+            opacity: 1;
+        }
+
+        #historyModal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #historyModal .relative {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        #overlayBlocker {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .modal-show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .modal-hide {
+            opacity: 0;
+            transform: scale(0.95);
+        }
     </style>
     <script>
         $.ajaxSetup({
@@ -769,13 +845,10 @@
                                 <span class="text-white font-semibold text-sm ml-2">Menu</span>
                             </a>
                             <div class="h-6 border-l border-gray-400 mx-2"></div>
-                            <a href="{{ route('watchlists') }}" class="flex items-center transition duration-150 ease-in-out inset-0 hover:bg-black bg-opacity-10 hover:bg-opacity-10 hover:shadow-md rounded-md p-1yyy">
+                            <a href="{{ route('watchlists') }}" class="flex items-center transition duration-150 ease-in-out inset-0 hover:bg-black bg-opacity-10 hover:bg-opacity-10 hover:shadow-md rounded-md p-2">
                                 <i class='bx bxs-bookmark-star text-white font-bold' style="font-size: 24px;"></i>
                                 <span class="text-white font-semibold text-sm ml-2">Watchlist</span>
                             </a>
-
-
-
                         </div>
 
                         <!-- Kontainer Login/Logout -->
@@ -862,11 +935,11 @@
             <div class="mt-4 text-justify">
                 <h3 class="text-lg font-bold text-red-500">Ulasan Film</h3>
                 <p class="mt-2 text-gray-400">
-                Tolong luangkan waktu sejenak untuk memberikan rating yang jujur dan konstruktif setelah menonton video trailer ini, karena setiap pendapat Anda sangat berarti dan dapat membantu pengguna lain dalam menentukan pilihan yang tepat sesuai dengan preferensi mereka. Dengan memberikan penilaian yang sesuai,
-                Anda berperan dalam menciptakan lingkungan yang informatif dan membantu orang lain menemukan konten yang benar-benar mereka nikmati, sehingga pengalaman menonton menjadi lebih menyenangkan dan bermanfaat."                </p>
+                    Tolong luangkan waktu sejenak untuk memberikan rating yang jujur dan konstruktif setelah menonton video trailer ini, karena setiap pendapat Anda sangat berarti dan dapat membantu pengguna lain dalam menentukan pilihan yang tepat sesuai dengan preferensi mereka. Dengan memberikan penilaian yang sesuai,
+                    Anda berperan dalam menciptakan lingkungan yang informatif dan membantu orang lain menemukan konten yang benar-benar mereka nikmati, sehingga pengalaman menonton menjadi lebih menyenangkan dan bermanfaat." </p>
                 <p class="mt-2 text-gray-400">
-                "Selain itu, kami sangat menghargai partisipasi Anda dalam komunitas kami, karena setiap rating tidak hanya mempengaruhi konten yang ditampilkan, tetapi juga memberikan masukan berharga bagi kami untuk terus meningkatkan kualitas layanan yang kami tawarkan.
-                Dengan berbagi pendapat dan pengalaman Anda, Anda turut berkontribusi dalam pengembangan platform ini, menjadikannya tempat yang lebih baik bagi semua pengguna yang mencari informasi dan hiburan yang berkualitas."
+                    "Selain itu, kami sangat menghargai partisipasi Anda dalam komunitas kami, karena setiap rating tidak hanya mempengaruhi konten yang ditampilkan, tetapi juga memberikan masukan berharga bagi kami untuk terus meningkatkan kualitas layanan yang kami tawarkan.
+                    Dengan berbagi pendapat dan pengalaman Anda, Anda turut berkontribusi dalam pengembangan platform ini, menjadikannya tempat yang lebih baik bagi semua pengguna yang mencari informasi dan hiburan yang berkualitas."
                 </p>
             </div>
 
@@ -876,7 +949,6 @@
         </div>
     </div>
     <!--end info -->
-
 
     <!-- Modal Tambah form -->
     <div id="popup-form-overlay" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center" style="z-index: 1999;">
@@ -1002,10 +1074,10 @@
             <div class="text-center p-6 border-b">
                 <div class="relative w-24 h-24 mx-auto">
                     <!-- Gambar Profil -->
-                    <img class="h-24 w-24 rounded-full mx-auto border-2 border-gray-300 shadow-md"
+                    <img class="h-24 w-24 rounded-full mx-auto border-2 border-gray-300 shadow-md object-cover"
                         src="{{ Auth::check() && Auth::user()->profile_photo_path 
-                 ? asset('storage/' . Auth::user()->profile_photo_path) 
-                 : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+         ? asset('storage/' . Auth::user()->profile_photo_path) 
+         : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                         alt="Profile Photo" />
 
                     <!-- Ikon Tambah untuk Mengganti Gambar Profil -->
@@ -1052,9 +1124,13 @@
                         @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                         @endforeach
+                        @if ($errors->has('profile_photo'))
+                        <li>Foto profil tidak boleh melebihi 2MB.</li>
+                        @endif
                     </ul>
                 </div>
                 @endif
+
 
                 <!-- Daftar Akun -->
                 <div class="mt-5">
@@ -1102,7 +1178,6 @@
     </div>
     <!-- end Akun -->
 
-
     <!-- Modal Settings -->
     <div id="settings-modal" class="fixed inset-0 hidden z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
         <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800 p-4 max-w-lg w-full">
@@ -1137,7 +1212,6 @@
             </div>
         </div>
     </div>
-
     <!-- end setting -->
 
     <!---pop up-->
@@ -1205,19 +1279,65 @@
 
     <!-- side bar -->
     <aside id="sidebar" class="sidebar-hidden fixed top-0 left-0 z-40 w-64 h-screen">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-[#363434]" style="border-radius: 0 1rem 1rem 0; overflow:hidden;">
+        <div class="h-full px-3 py-4 overflow-y-auto bg-[#363434]" style="overflow:hidden;">
             <ul class="space-y-2 font-medium">
-                <!-- Label User dengan Background Color -->
                 <li>
-                    <span class="block px-2 py-1 text-sm font-semibold text-gray dark:text-gray-400 bg-gray-700 rounded">Profile</span>
-                </li>
-                <!-- Opsi untuk User -->
-                <li>
+                    @csrf
                     <a href="#" id="akun-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                            <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+                        <!-- Foto Profil di Sebelah Kiri (Ukuran lebih besar) -->
+                        <img class="h-14 w-14 rounded-full mr-2 object-cover"
+                            src="{{ auth()->check() && auth()->user()->profile_photo_path 
+           ? asset('storage/' . auth()->user()->profile_photo_path) 
+           : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+                            alt="Profile Photo" />
+
+                        <span class="flex-1 text-sm ms-2 whitespace-nowrap">
+                            {{ auth()->check() ? auth()->user()->username : 'Guest' }}
+                        </span>
+
+                        <i class='bx bx-dots-vertical-rounded bx-rotate-90 text-lg text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white -ml-2'></i>
+                    </a>
+                </li>
+
+                <li>
+                    <hr class="border-t border-gray-500 w-full mx-0 my-2">
+
+                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">
+                        GENERAL
+                    </span>
+                </li>
+
+                <li>
+                    <a href="#" id="watchlist-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 2l12 4v12l-12-4V2Zm1 2v7.5l8 2.5V4.5l-8-2.5ZM4 8v11l12 4v-2l-10-3.333V7.667L4 8Zm2 3.5V19l10 3v-3.5l-8-2.5V11.5Z" />
                         </svg>
-                        <span class="flex-1 ms-3 whitespace-nowrap">Akun</span>
+                        <span class="ms-3 text-sm">My Collection</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="historyButton" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5A8.5 8.5 0 0 0 12 3.5ZM2 12A10 10 0 1 1 12 22 10 10 0 0 1 2 12Zm10.25-.75V7a.75.75 0 1 0-1.5 0v5a.75.75 0 0 0 .75.75h4a.75.75 0 0 0 0-1.5Z" />
+                            <path d="M7.75 4.75a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.06-1.06Z" />
+                        </svg>
+                        <span class="ms-3 text-sm">History</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="notificationBtn" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 24a2.62 2.62 0 0 0 2.623-2.623h-5.246A2.623 2.623 0 0 0 12 24Zm10.407-6.24c-.77-.91-2.186-2.287-2.186-6.647 0-3.395-2.202-6.25-5.313-7.063V3.5a2.908 2.908 0 0 0-5.816 0v.55c-3.111.813-5.313 3.668-5.313 7.063 0 4.36-1.417 5.737-2.186 6.647A1.069 1.069 0 0 0 2.824 19.5h18.352a1.07 1.07 0 0 0 .825-1.74Z" />
+                        </svg>
+                        <span class="ms-3 text-sm">Notification</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M15 14c2.761 0 5-1.239 5-3v-.5C20 9.14 18.373 8 15 8s-5 1.14-5 2.5V11c0 1.761 2.239 3 5 3Zm0 2c-2.608 0-8 1.308-8 4v1h16v-1c0-2.692-5.392-4-8-4ZM9 10c0-1.329.368-2.036 1.151-2.58.748-.521 1.842-.669 3.087-.739-.137-2.247-1.165-3.681-4.238-3.681C6.373 3 4 5.36 4 8.16V9.5C4 10.761 6.239 12 9 12v-2Zm-1 1.974c-2.455 0-5 .729-5 2.383V16h5.303c.011-.4.044-.792.103-1.176-1.189-.55-2.26-1.133-2.406-1.85Z" />
+                        </svg>
+                        <span class="ms-3 text-sm">Friends</span>
                     </a>
 
                 </li>
@@ -1227,32 +1347,12 @@
                             <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
                             <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                         </svg>
-                        <span class="ms-3">Settings</span>
+                        <span class="ms-3 text-sm">Settings</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" id="watchlist-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                            <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                        </svg>
-                        <span class="ms-3">Watchlist</span>
-                    </a>
-                </li>
-
-                <!-- Label Admin dengan Background Color -->
-                <li>
-                    <span class="block px-2 py-1 text-sm font-semibold text-gray-300 dark:text-gray-400 bg-gray-700 rounded">Tambah</span>
-                </li>
-                <!-- Opsi untuk Admin -->
-                <li>
-                    <a href="#" id="tambah-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <span class="ms-3">Tambah</span>
-                        <span class="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300">opsional</span>
-                    </a>
+                    <hr class="border-t border-gray-500 w-full mx-0 my-2">
+                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">MISCELLANEOUS</span>
                 </li>
                 <li>
                     <a href="#" id="info-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -1260,8 +1360,30 @@
                             <path d="M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12 12-5.383 12-12S18.617 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z" />
                             <path d="M11 10h2v7h-2zm0-4h2v2h-2z" />
                         </svg>
-                        <span class="ms-3">Info</span>
+                        <span class="ms-3 text-sm">Info</span>
                     </a>
+                </li>
+                <li>
+                    <hr class="border-t border-gray-500 w-full mx-0 my-2">
+                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">ADMIN PANEL</span>
+                </li>
+                <li>
+                    <a href="#" id="tambah-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span class="ms-3 text-sm">Tambah</span>
+                        <span class="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300">opsional</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M15 14c2.761 0 5-1.239 5-3v-.5C20 9.14 18.373 8 15 8s-5 1.14-5 2.5V11c0 1.761 2.239 3 5 3Zm0 2c-2.608 0-8 1.308-8 4v1h16v-1c0-2.692-5.392-4-8-4ZM9 10c0-1.329.368-2.036 1.151-2.58.748-.521 1.842-.669 3.087-.739-.137-2.247-1.165-3.681-4.238-3.681C6.373 3 4 5.36 4 8.16V9.5C4 10.761 6.239 12 9 12v-2Zm-1 1.974c-2.455 0-5 .729-5 2.383V16h5.303c.011-.4.044-.792.103-1.176-1.189-.55-2.26-1.133-2.406-1.85Z" />
+                        </svg>
+                        <span class="ms-3 text-sm">tambah info</span>
+                    </a>
+
                 </li>
                 <li>
                     <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -1269,36 +1391,79 @@
                             <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
                             <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                         </svg>
-                        <span class="ms-3">Lainnya</span>
+                        <span class="ms-3 text-sm">Lainnya</span>
                     </a>
                 </li>
             </ul>
-            <div id="dropdown-cta" class="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-red-900" role="alert">
-                <div class="flex items-center mb-3">
-                    <span class="bg-orange-100 text-orange-800 text-sm font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-orange-200 dark:text-orange-900">Info Penting</span>
-                    <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-blue-50 inline-flex justify-center items-center w-6 h-6 text-blue-900 rounded-lg focus:ring-2 focus:ring-blue-400 p-1 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800" data-dismiss-target="#dropdown-cta" aria-label="Close">
-                        <span class="sr-only">Close</span>
-                        <svg class="w-2.5 h-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                        </svg>
-                    </button>
-                </div>
-                <p class="mb-3 text-sm text-gray-800 dark:text-gray-400">
-                    Preview the new Flowbite dashboard navigation! You can turn the new navigation off for a limited time in your profile.
-                </p>
-                <a class="text-sm text-blue-800 underline font-medium hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" href="#">Turn new navigation off</a>
-            </div>
         </div>
     </aside>
     <!--end side bar -->
 
-    <!-- Modal Structure -->
-    <div id="watchlistModal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50">
-        <div class="relative p-4 w-full max-w-2xl h-full md:h-auto">
+    <!-- Modal History -->
+    <div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out">
+        <div class="relative w-auto max-w-4xl p-6 bg-gray-900 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out scale-95 opacity-0">
+            <button id="closeModal" class="absolute top-3 right-3 text-white text-xl hover:text-red-400 transition duration-200">
+                &times;
+            </button>
+
+            <div class="sticky top-0 bg-gray-900 z-10">
+                <div class="flex justify-end -mb-10 pr-1">
+                    <select id="sortOrder" class="p-2 text-sm bg-gray-800 text-white border border-gray-600 rounded">
+                        <option value="newest">Terbaru</option>
+                        <option value="oldest">Terlama</option>
+                    </select>
+                </div>
+                <h3 class="text-3xl text-white font-bold mb-0.5 border-b-2 border-red-600 pb-4">History</h3>
+            </div>
+
+
+            <div id="historyContainer" class="overflow-y-auto max-h-96 pr-2" style="scrollbar-width: thin; scrollbar-color: #4b5563 #1f2937;">
+            </div>
+        </div>
+    </div>
+    <!-- Overlay -->
+    <div id="overlayBlocker" class="hidden fixed inset-0 bg-black opacity-50"></div>
+
+    <!-- modal notificatiom -->
+    <div id="notificationModal" class="fixed inset-0 hidden z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
+
+            <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="w-6 h-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h1m0-4h-1m7-1h-7a5 5 0 00-5 5v7a5 5 0 005 5h7a5 5 0 005-5v-7a5 5 0 00-5-5z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">Notification</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    You have new notifications!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="closeModalBtn" class="inline-flex justify-center px-4 py-2 text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal notificatiom -->
+
+    <!-- Modal watchlist -->
+    <div id="watchlistModal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50 transition-opacity duration-500 ease-in-out">
+        <div class="modal-content relative p-4 w-full max-w-2xl h-full md:h-auto opacity-0 transform scale-95 transition-transform duration-500 ease-in-out">
             <div class="relative bg-white rounded-lg shadow">
                 <div class="flex justify-between items-center p-5 rounded-t border-b">
-                    <h3 class="text-xl font-medium text-gray-900">Your Watchlist</h3>
-                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-hide="watchlistModal">
+                    <h3 class="text-xl font-medium text-gray-900">My Collection</h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-watchlist-hide="watchlistModal">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                         </svg>
@@ -1310,22 +1475,16 @@
                 <div class="p-6 space-y-6">
                     <div id="modal-watchlist-content">
                         <ul id="modalWatchlistItems" class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            @php
-                            $hasTrailer = false;
-                            @endphp
+                            @php $hasTrailer = false; @endphp
 
                             @forelse ($watchlistItems as $item)
                             @if($item->trailer)
-                            @php
-                            $hasTrailer = true;
-                            @endphp
-                            <li class="watchlist-item" data-title="{{ strtolower($item->trailer->title) }}">
+                            @php $hasTrailer = true; @endphp
+                            <li class="watchlist-item transition-transform duration-300 ease-in-out" data-title="{{ strtolower($item->trailer->title) }}">
                                 <a href="{{ route('home.detail', $item->trailer->id) }}" class="group block overflow-hidden">
                                     <img src="{{ asset('upload/' . $item->trailer->poster) }}" alt="{{ $item->trailer->title }}" class="h-[150px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[150px]" />
                                     <div class="relative bg-white pt-3">
-                                        <h3 class="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">
-                                            {{ $item->trailer->title }}
-                                        </h3>
+                                        <h3 class="text-xs text-gray-700 group-hover:underline group-hover:underline-offset-4">{{ $item->trailer->title }}</h3>
                                     </div>
                                 </a>
                             </li>
@@ -1342,12 +1501,15 @@
                             </li>
                             @endif
                         </ul>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- End modal watchlist -->
+
+
+
 
     <!--home-->
     <div id="main-content">
@@ -1419,7 +1581,7 @@
 
 
                 <!-- Recommendations Section -->
-                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8 bg-black bg-opacity-75 rounded-lg p-4 shadow-black">
+                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8 bg-black bg-opacity-75 rounded-lg p-4 shadow-lg shadow-black">
                     <h1 class="text-black text-xl font-bold mb-4 px-4 py-2 rounded-lg">
                         <span class="border-l-4 border-red-600 pl-2 text-white">{{ __('Recommended Movies') }}</span>
                     </h1>
@@ -1472,18 +1634,25 @@
                         data-poster="{{ asset('upload/' . $trailers->poster) }}"
                         data-trailer-id="{{ $trailers->id }}">
 
-
                         <!-- Konten trailer lainnya -->
                         <div class="video-container rounded-t-lg overflow-hidden" id="video-container-{{ $loop->index }}">
                             <a href="{{ route('home.detail', $trailers->id) }}">
-                                <video width="100%" height="250" poster="{{ asset('upload/' . $trailers->poster) }}" class="video h-[250px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[290px]" id="video-gladiator-{{ $loop->index }}">
+                                <video width="100%" height="250" poster="{{ asset('upload/' . $trailers->poster) }}"
+                                    class="video h-[250px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[290px]"
+                                    id="video-gladiator-{{ $loop->index }}">
                                     <source id="video-source-{{ $loop->index }}" src="{{ asset('upload/' . $trailers->vidio) }}" type="video/mp4">
                                 </video>
                             </a>
+
                             <div class="absolute -top-2 -left-3.5 flex items-center justify-center">
-                                <i class='bx bxs-bookmark-star text-gray-700 text-6xl'></i>
-                                <i class='bx bx-plus text-white absolute text-2xl' style="top: 10px;"></i>
+                                <i class='bx bxs-bookmark-star text-gray-700 text-6xl {{ $trailers->watchlists->where('user_id', auth()->id())->count() ? 'text-red-700' : '' }} bookmark-icon'></i>
+                                @if($trailers->watchlists->where('user_id', auth()->id())->count())
+                                <i class='bx bxs-check-circle text-white absolute text-2xl check-icon' style="top: 10px;"></i>
+                                @else
+                                <i class='bx bx-plus text-white absolute text-2xl plus-icon' style="top: 10px;"></i>
+                                @endif
                             </div>
+
 
                             <div class="absolute bottom-0 left-0 m-2 play-button">
                                 <div class="play-icon-container">
@@ -1499,12 +1668,27 @@
                                 <div class="current-time text-white font-bold" id="current-time-{{ $loop->index }}"></div>
                             </div>
                         </div>
+
                         <div class="bg-black bg-opacity-75 p-2 rounded-b-lg">
+                            <!-- Rating stars -->
+                            <div class="flex items-center text-white text-xs mb-2"> <!-- Tambahkan class `mb-2` untuk memberikan margin bawah -->
+                                <!-- Satu bintang berwarna kuning -->
+                                <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                                </svg>
+
+                                <!-- Tampilkan nilai rating -->
+                                <p class="average-rating ms-1">{{ number_format($trailers->averageRating(), 2) }}</p>
+                            </div>
+
+                            <!-- Judul dan konten lainnya -->
                             <h3 class="text-sm">Official trailer</h3>
                             <h3 class="text-lg mt-1 font-semibold mb-2 truncate">{{ $trailers->title }}</h3>
+
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium">{{ $trailers->populer }} | {{ $trailers->tahun }}</span>
                             </div>
+
                             <div class="flex items-center mt-4 mb-5">
                                 <i class='bx bx-like mr-2 cursor-pointer' id="like-{{ $loop->index }}"></i>
                                 <span id="like-count-{{ $loop->index }}">{{ $trailers->likes_count }}</span>
@@ -1513,11 +1697,13 @@
                                 <i class="bx bxs-bookmark-star cursor-pointer px-2 {{ $trailers->watchlists->where('user_id', auth()->id())->count() ? 'text-red-700' : '' }}"></i>
                             </div>
                         </div>
+
                     </li>
                     @endforeach
                 </ul>
             </section>
         </div>
+
     </div>
     <!--end home-->
 
@@ -1533,66 +1719,177 @@
                 menuLink.addEventListener('click', function(event) {
                     event.preventDefault();
                     popupOverlay.classList.add('active');
-                    body.classList.add('overflow-hidden'); // Hilangkan scroll
+                    body.classList.add('overflow-hidden');
                 });
             }
 
             if (closePopupButton) {
                 closePopupButton.addEventListener('click', function() {
-                    popupOverlay.classList.add('closing'); // Tambahkan kelas closing
+                    popupOverlay.classList.add('closing');
                     setTimeout(function() {
                         popupOverlay.classList.remove('active', 'closing');
-                        body.classList.remove('overflow-hidden'); // Aktifkan scroll kembali
-                    }, 500); // Sesuaikan dengan durasi animasi
+                        body.classList.remove('overflow-hidden');
+                    }, 500);
                 });
             }
 
-
-
-
-            //watchist modal
-            document.getElementById('watchlist-link').addEventListener('click', function(event) {
+            //modal notification
+            document.getElementById('notificationBtn').addEventListener('click', function(event) {
                 event.preventDefault();
-                const modal = document.getElementById('watchlistModal');
-                modal.classList.remove('hidden'); // Hapus class hidden untuk menampilkan modal
-                modal.classList.remove('modal-hide'); // Hapus class animasi hide (jika ada)
-                modal.classList.add('modal-show'); // Tambahkan class animasi show
+                document.getElementById('notificationModal').classList.add('active');
             });
 
-            document.querySelector('[data-modal-hide="watchlistModal"]').addEventListener('click', function() {
-                const modal = document.getElementById('watchlistModal');
-                modal.classList.remove('modal-show'); // Hapus class animasi show
-                modal.classList.add('modal-hide'); // Tambahkan class animasi hide
-
-                // Sembunyikan modal setelah animasi selesai
-                modal.addEventListener('animationend', function() {
-                    if (modal.classList.contains('modal-hide')) {
-                        modal.classList.add('hidden'); // Sembunyikan modal setelah animasi selesai
-                    }
-                }, {
-                    once: true
-                });
+            document.getElementById('closeModalBtn').addEventListener('click', function() {
+                document.getElementById('notificationModal').classList.remove('active');
             });
 
-            // Fitur search
-            document.getElementById('modalWatchlistSearch').addEventListener('input', function() {
-                const searchValue = this.value.toLowerCase();
-                const watchlistItems = document.querySelectorAll('.watchlist-item');
+            // Mendapatkan elemen yang diperlukan
+            const watchlistLink = document.getElementById('watchlist-link');
+            const watchlistModal = document.getElementById('watchlistModal');
+            const watchlistCloseButton = watchlistModal.querySelector('[data-watchlist-hide="watchlistModal"]');
+            const modalContent = watchlistModal.querySelector('.modal-content');
+            const modalWatchlistSearch = document.getElementById('modalWatchlistSearch');
+            const modalWatchlistItems = document.getElementById('modalWatchlistItems');
 
-                watchlistItems.forEach(function(item) {
+            function showWatchlistModal() {
+                watchlistModal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.add('modal-show');
+                    modalContent.classList.remove('modal-hide');
+                }, 10);
+            }
+
+            function hideWatchlistModal() {
+                modalContent.classList.add('modal-hide');
+                modalContent.classList.remove('modal-show');
+                setTimeout(() => {
+                    watchlistModal.classList.add('hidden');
+                }, 500);
+            }
+
+            watchlistLink.addEventListener('click', function(event) {
+                event.preventDefault();
+                showWatchlistModal();
+            });
+
+            watchlistCloseButton.addEventListener('click', function() {
+                hideWatchlistModal();
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === watchlistModal) {
+                    hideWatchlistModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    hideWatchlistModal();
+                }
+            });
+
+            modalWatchlistSearch.addEventListener('input', function() {
+                const searchTerm = modalWatchlistSearch.value.toLowerCase();
+                const items = modalWatchlistItems.querySelectorAll('.watchlist-item');
+                items.forEach(item => {
                     const title = item.getAttribute('data-title');
-
-                    // Cek apakah judul trailer cocok dengan input search
-                    if (title.includes(searchValue)) {
-                        item.style.display = 'block'; // Tampilkan item jika cocok
+                    if (title.includes(searchTerm)) {
+                        item.style.display = 'block';
                     } else {
-                        item.style.display = 'none'; // Sembunyikan item jika tidak cocok
+                        item.style.display = 'none';
                     }
                 });
             });
 
 
 
+            //modal history
+            const historyButton = document.getElementById('historyButton');
+            const historyModal = document.getElementById('historyModal');
+            const closeModalButton = document.getElementById('closeModal');
+            const overlayBlocker = document.getElementById('overlayBlocker');
+            const historyContainer = document.getElementById('historyContainer');
+            const sortOrderSelect = document.getElementById('sortOrder');
+
+            function renderHistory(savedHistory) {
+                historyContainer.innerHTML = '';
+
+                savedHistory.forEach(function(item, index) {
+                    let date = new Date(item.timestamp);
+                    let formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+
+                    let historyItem = `
+            <div class="history-item flex mb-4 p-4 bg-gray-800 rounded-lg">
+                <img src="${item.poster}" alt="Poster Image" class="rounded-lg w-32 h-48 object-cover mr-4">
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <p class="text-xl text-white font-bold">${item.title}</p>
+                        <p class="text-sm text-gray-400">${item.genre}</p>
+                        <p class="text-sm text-gray-400">${item.year}</p>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="text-sm text-gray-500">${formattedDate}</p>
+                        <button class="deleteHistoryButton text-red-500 pl-5" data-index="${index}">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                    historyContainer.innerHTML += historyItem;
+                });
+
+                const deleteButtons = document.querySelectorAll('.deleteHistoryButton');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        savedHistory.splice(index, 1);
+                        localStorage.setItem('videoHistory', JSON.stringify(savedHistory));
+                        renderHistory(savedHistory);
+                    });
+                });
+            }
+
+            historyButton.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
+
+                sortOrderSelect.addEventListener('change', function() {
+                    if (this.value === 'newest') {
+                        savedHistory.sort((a, b) => b.timestamp - a.timestamp);
+                    } else {
+                        savedHistory.sort((a, b) => a.timestamp - b.timestamp);
+                    }
+                    renderHistory(savedHistory);
+                });
+
+                renderHistory(savedHistory);
+
+                historyModal.classList.remove('hidden');
+                overlayBlocker.classList.remove('hidden');
+                setTimeout(() => {
+                    historyModal.querySelector('.relative').classList.remove('scale-95', 'opacity-0');
+                    historyModal.querySelector('.relative').classList.add('scale-100', 'opacity-100');
+                }, 10);
+            });
+
+            closeModalButton.addEventListener('click', function() {
+                historyModal.querySelector('.relative').classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    historyModal.classList.add('hidden');
+                    overlayBlocker.classList.add('hidden');
+                }, 300);
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === overlayBlocker) {
+                    historyModal.querySelector('.relative').classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        historyModal.classList.add('hidden');
+                        overlayBlocker.classList.add('hidden');
+                    }, 300);
+                }
+            });
 
 
 
@@ -1610,17 +1907,16 @@
                         },
                         success: function(response) {
                             if (response.status === 'added') {
-                                bookmarkIcon.addClass('text-red-700'); // Ganti warna saat ditambahkan
+                                bookmarkIcon.addClass('text-red-700');
                             } else {
-                                bookmarkIcon.removeClass('text-red-700'); // Kembali ke warna default saat dihapus
+                                bookmarkIcon.removeClass('text-red-700');
                             }
+
+                            location.reload();
                         }
                     });
                 });
             });
-
-
-
 
             //recomended movies
             document.getElementById('nextSlide').addEventListener('click', function() {
@@ -1636,7 +1932,7 @@
                     .then(response => response.json())
                     .then(data => {
                         const recommendationsSection = document.querySelector('section.flex.flex-col.space-y-4.mt-4');
-                        recommendationsSection.innerHTML = ''; // Kosongkan konten sebelumnya
+                        recommendationsSection.innerHTML = '';
 
                         data.forEach(item => {
                             recommendationsSection.innerHTML += `
@@ -1670,8 +1966,8 @@
 
 
             // Video Duration
-            const sliderImages = document.querySelectorAll('.slider img'); // Mengambil gambar di slider
-            const recommendationVideos = document.querySelectorAll('.flex.flex-col.space-y-4 video'); // Mengambil video di rekomendasi
+            const sliderImages = document.querySelectorAll('.slider img');
+            const recommendationVideos = document.querySelectorAll('.flex.flex-col.space-y-4 video');
 
             // Format Durasi
             function formatDuration(duration) {
@@ -1721,7 +2017,7 @@
             let autoSlideInterval;
             let isDragging = false;
             let startPos = 0;
-            let isDraggingAction = false; // Tambahkan ini
+            let isDraggingAction = false;
 
             function updateSlidePosition() {
                 slides.style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -1813,30 +2109,24 @@
             const searchHistoryContainer = document.getElementById('search-history');
             const searchContainer = document.querySelector('.relative.flex-1');
 
-            // Array untuk menyimpan riwayat pencarian
             let searchHistory = [];
 
-            // Event listener untuk input pencarian
             searchInput.addEventListener('input', function() {
                 const searchQuery = this.value.toLowerCase();
 
-                // Hapus riwayat pencarian saat pengguna mengetik
                 if (searchQuery) {
                     searchHistoryContainer.classList.add('hidden');
                 }
 
-                // Tampilkan saran berdasarkan input
                 updateSuggestions(searchQuery);
             });
 
-            // Event listener untuk menampilkan riwayat pencarian saat mengklik input pencarian
             searchInput.addEventListener('focus', function() {
                 if (searchHistory.length > 0) {
                     updateSearchHistory();
                 }
             });
 
-            // Event listener untuk menyembunyikan riwayat dan saran pencarian jika klik di luar
             document.addEventListener('click', function(e) {
                 if (!searchContainer.contains(e.target)) {
                     searchHistoryContainer.classList.add('hidden');
@@ -1844,7 +2134,6 @@
                 }
             });
 
-            // Fungsi untuk memperbarui saran pencarian dengan poster kecil
             function updateSuggestions(query) {
                 suggestions.innerHTML = '';
 
@@ -1852,30 +2141,27 @@
                     suggestions.classList.remove('hidden');
 
                     const trailers = document.querySelectorAll('li[data-title]');
-                    const addedTitles = []; // Array untuk melacak judul yang sudah ditambahkan agar tidak ganda
+                    const addedTitles = [];
 
                     trailers.forEach(function(trailer) {
                         const title = trailer.getAttribute('data-title').toLowerCase();
-                        const posterUrl = trailer.getAttribute('data-poster'); // Mengambil URL poster dari data-poster
+                        const posterUrl = trailer.getAttribute('data-poster');
 
                         if (title.includes(query) && !addedTitles.includes(title)) {
                             const suggestionItem = document.createElement('a');
                             suggestionItem.href = '#';
                             suggestionItem.className = 'suggestion-item hover:bg-gray-100 p-2 block';
 
-                            // Tambahkan gambar poster kecil
                             const posterImg = document.createElement('img');
                             posterImg.src = posterUrl;
                             posterImg.alt = 'Poster';
-                            posterImg.className = 'w-10 h-10 mr-2 inline-block'; // Ukuran kecil dan spasi dengan teks
+                            posterImg.className = 'w-10 h-10 mr-2 inline-block';
                             suggestionItem.appendChild(posterImg);
 
-                            // Tambahkan teks judul
                             const titleText = document.createElement('span');
                             titleText.textContent = trailer.getAttribute('data-title');
                             suggestionItem.appendChild(titleText);
 
-                            // Event klik untuk memilih saran
                             suggestionItem.addEventListener('click', function(e) {
                                 e.preventDefault();
                                 searchInput.value = trailer.getAttribute('data-title');
@@ -1883,15 +2169,12 @@
                                 suggestions.classList.add('hidden');
                             });
 
-                            // Tambahkan elemen saran ke dalam suggestions
                             suggestions.appendChild(suggestionItem);
 
-                            // Tambahkan judul ke array untuk menghindari duplikasi
                             addedTitles.push(title);
                         }
                     });
 
-                    // Jika tidak ada saran yang sesuai, sembunyikan suggestions
                     if (suggestions.innerHTML === '') {
                         suggestions.classList.add('hidden');
                     }
@@ -1919,35 +2202,30 @@
                 }
             }
 
-            // Event listener untuk menangani pencarian saat menekan Enter
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const query = this.value;
 
-                    // Simpan pencarian ke dalam riwayat dan tampilkan riwayat
                     if (query && !searchHistory.includes(query)) {
                         searchHistory.push(query);
                         updateSearchHistory();
                     }
 
-                    performSearch(query); // Panggil fungsi performSearch saat Enter ditekan
+                    performSearch(query);
                 }
             });
 
-            // Fungsi untuk memperbarui riwayat pencarian (tambahkan logika sesuai kebutuhan)
             function updateSearchHistory() {
                 searchHistoryContainer.innerHTML = '';
                 searchHistory.forEach(function(item, index) {
                     const historyItem = document.createElement('div');
                     historyItem.className = 'flex justify-between items-center p-2';
 
-                    // Tampilkan item riwayat pencarian
                     const historyText = document.createElement('span');
                     historyText.textContent = item;
                     historyItem.appendChild(historyText);
 
-                    // Tambahkan tombol hapus
                     const deleteButton = document.createElement('button');
                     deleteButton.innerHTML = "<i class='bx bx-x text-red-500 text-3xl'></i>";
                     deleteButton.className = 'ml-2 text-red-600 hover:underline';
@@ -1962,11 +2240,11 @@
                 searchHistoryContainer.classList.remove('hidden');
             }
 
-            // Fungsi untuk menghapus item riwayat pencarian
             function removeSearchHistory(index) {
-                searchHistory.splice(index, 1); // Hapus item dari array
-                updateSearchHistory(); // Perbarui tampilan riwayat pencarian
+                searchHistory.splice(index, 1);
+                updateSearchHistory();
             }
+
 
             //tambah
             const addButton = document.querySelector('#tambah-link');
@@ -1982,7 +2260,7 @@
                     popupFormOverlay.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
                     popupFormOverlay.style.opacity = '1';
                     popupFormOverlay.style.transform = 'scale(1)';
-                }, 10); // Delay to ensure transition is applied
+                }, 10);
             }
 
             function hideModal() {
@@ -1992,7 +2270,7 @@
 
                 setTimeout(() => {
                     popupFormOverlay.style.display = 'none';
-                }, 300); // Match this duration with your transition duration
+                }, 300);
             }
 
             if (addButton) {
@@ -2050,7 +2328,6 @@
                 });
             });
 
-            // Menampilkan kontrol video saat tombol play ditekan
             document.querySelectorAll('.play-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const videoContainer = this.closest('.video-container');
@@ -2062,16 +2339,12 @@
                 });
             });
 
-            // Memperlihatkan menu kontrol saat ikon titik tiga ditekan
             document.querySelectorAll('.video-controls-icon').forEach(icon => {
                 icon.addEventListener('click', function() {
                     const videoControls = this.closest('.video-controls');
                     videoControls.classList.toggle('show');
                 });
             });
-
-
-
 
             // Kontrol kecepatan
             document.querySelectorAll('.speed-control').forEach(select => {
@@ -2080,6 +2353,8 @@
                     video.playbackRate = parseFloat(this.value);
                 });
             });
+
+
 
             // Dropdown menu with animation
             const dropdownButton = document.getElementById('dropdownButton');
@@ -2117,45 +2392,36 @@
             });
 
             // Sidebar
-            // Dapatkan elemen sidebar, konten utama, dan ikon pengaturan
             const settingsIcon = document.getElementById('settings-icon');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
 
-            // Variabel untuk menyimpan posisi scroll
             let scrollPosition = 0;
 
-            // Fungsi untuk menampilkan/menyembunyikan sidebar
             function toggleSidebar() {
                 if (sidebar.classList.contains('visible')) {
-                    // Simpan posisi scroll saat sidebar ditutup
                     scrollPosition = window.scrollY;
                     sidebar.classList.remove('visible');
                     mainContent.classList.remove('shifted');
                     localStorage.setItem('sidebarVisible', 'false');
 
-                    // Tunggu sedikit sebelum mengembalikan scroll
                     setTimeout(() => {
                         window.scrollTo(0, scrollPosition);
-                    }, 0); // Penundaan kecil
+                    }, 0);
                 } else {
-                    // Simpan posisi scroll saat sidebar dibuka
                     scrollPosition = window.scrollY;
                     sidebar.classList.add('visible');
                     mainContent.classList.add('shifted');
                     localStorage.setItem('sidebarVisible', 'true');
 
-                    // Tunggu sedikit sebelum memulihkan posisi scroll
                     setTimeout(() => {
                         window.scrollTo(0, scrollPosition);
-                    }, 0); // Penundaan kecil
+                    }, 0);
                 }
             }
 
-            // Tambahkan event listener untuk mengubah status sidebar ketika ikon pengaturan diklik
             settingsIcon.addEventListener('click', toggleSidebar);
 
-            // Cek status awal sidebar dari localStorage saat halaman dimuat
             const isSidebarVisible = localStorage.getItem('sidebarVisible') === 'true';
             if (isSidebarVisible) {
                 sidebar.classList.add('visible');
@@ -2164,7 +2430,6 @@
                 sidebar.classList.remove('visible');
             }
 
-            // Panggil fungsi penyesuaian grid video setelah halaman selesai dimuat
             document.addEventListener('DOMContentLoaded', () => {
                 if (isSidebarVisible) {
                     mainContent.classList.add('shifted');
@@ -2181,24 +2446,24 @@
                 infoLink.addEventListener('click', function(event) {
                     event.preventDefault();
                     infoModal.classList.remove('hidden');
-                    infoModal.classList.add('fade-in'); // Tambahkan animasi fade-in
+                    infoModal.classList.add('fade-in');
                 });
 
                 closeInfoModal.addEventListener('click', function() {
-                    infoModal.classList.add('fade-out'); // Tambahkan animasi fade-out
+                    infoModal.classList.add('fade-out');
                     setTimeout(function() {
                         infoModal.classList.add('hidden');
                         infoModal.classList.remove('fade-in', 'fade-out');
-                    }, 300); // Waktu animasi fade-out
+                    }, 300);
                 });
 
                 window.addEventListener('click', function(event) {
                     if (event.target === infoModal) {
-                        infoModal.classList.add('fade-out'); // Tambahkan animasi fade-out
+                        infoModal.classList.add('fade-out');
                         setTimeout(function() {
                             infoModal.classList.add('hidden');
                             infoModal.classList.remove('fade-in', 'fade-out');
-                        }, 300); // Waktu animasi fade-out
+                        }, 300);
                     }
                 });
             }
@@ -2260,12 +2525,21 @@
 
 
             // Close dropdown alert
-            const closeButton = document.querySelector('[data-dismiss-target="#dropdown-cta"]');
             const alertBox = document.getElementById('dropdown-cta');
+            const isAlertClosed = localStorage.getItem('dropdownAlertClosed');
+
+            if (!isAlertClosed) {
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
+
+            const closeButton = document.querySelector('[data-dismiss-target="#dropdown-cta"]');
 
             if (closeButton && alertBox) {
                 closeButton.addEventListener('click', function() {
-                    alertBox.remove();
+                    alertBox.style.display = 'none';
+                    localStorage.setItem('dropdownAlertClosed', 'true');
                 });
             }
 
@@ -2276,7 +2550,6 @@
             const closeSettingsModal = document.getElementById('close-modal');
             const closeSettingsButton = document.getElementById('close-modal-button');
 
-            // Buka modal settings
             if (settingsLink) {
                 settingsLink.addEventListener('click', function(event) {
                     event.preventDefault();
@@ -2285,7 +2558,6 @@
                 });
             }
 
-            // Tutup modal settings
             if (closeSettingsModal) {
                 closeSettingsModal.addEventListener('click', function() {
                     settingsModal.classList.add('hidden');
@@ -2300,7 +2572,6 @@
                 });
             }
 
-            // Ganti tema (light atau dark)
             document.getElementById('theme-select').addEventListener('change', function() {
                 const theme = this.value;
                 if (theme === 'dark') {
@@ -2310,17 +2581,15 @@
                 }
             });
 
-            // Ganti bahasa secara dinamis
             document.getElementById('language-select').addEventListener('change', function() {
                 const language = this.value;
                 if (language === 'english') {
-                    changeLanguage('en'); // Ganti ke bahasa Inggris
+                    changeLanguage('en');
                 } else {
-                    changeLanguage('id'); // Ganti ke bahasa Indonesia
+                    changeLanguage('id');
                 }
             });
 
-            // Fungsi untuk mengganti teks berdasarkan bahasa yang dipilih
             function changeLanguage(lang) {
                 fetch(`/lang/${lang}`)
                     .then(response => response.json())
@@ -2330,11 +2599,9 @@
                         document.querySelector('label[for="theme-select"]').textContent = data.select_theme;
                         document.getElementById('close-modal-button').textContent = data.save;
 
-                        // Ganti opsi dropdown bahasa
                         document.querySelector('#language-select option[value="english"]').textContent = data.english;
                         document.querySelector('#language-select option[value="indo"]').textContent = data.indonesian;
 
-                        // Ganti opsi dropdown tema
                         document.querySelector('#theme-select option[value="light"]').textContent = data.light;
                         document.querySelector('#theme-select option[value="dark"]').textContent = data.dark;
                     });
@@ -2344,7 +2611,6 @@
             document.getElementById('language-select').addEventListener('change', function() {
                 const language = this.value;
 
-                // AJAX untuk mengganti bahasa
                 fetch('/change-language', {
                         method: 'POST',
                         headers: {
@@ -2357,7 +2623,7 @@
                     })
                     .then(response => {
                         if (response.ok) {
-                            location.reload(); // Refresh halaman agar bahasa diperbarui
+                            location.reload();
                         }
                     });
             });
