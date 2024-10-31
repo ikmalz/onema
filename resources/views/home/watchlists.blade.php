@@ -173,28 +173,26 @@
     document.addEventListener("DOMContentLoaded", function() {
       const items = document.querySelectorAll(".fade-in");
 
-      // Tampilkan elemen dengan animasi fade-in saat halaman dimuat
       items.forEach((item, index) => {
         setTimeout(() => {
-          item.style.display = "block"; // tampilkan item
-          item.classList.add("visible"); // tambahkan kelas untuk animasi
-        }, index * 100); // delay berdasarkan indeks
+          item.style.display = "block";
+          item.classList.add("visible"); 
+        }, index * 100); 
       });
 
-      // Fungsi pencarian
+      //  pencarian
       document.getElementById("search-input").addEventListener("input", function() {
         const query = this.value.toLowerCase();
         const items = document.querySelectorAll("ul li.fade-in");
 
         let found = false;
 
-        // Filter items berdasarkan pencarian
         items.forEach(item => {
           const title = item.querySelector("h3").textContent.toLowerCase();
           if (title.includes(query)) {
-            item.style.display = "block"; // tampilkan item
-            item.classList.add("visible"); // pastikan animasi ditambahkan saat ditemukan
-            found = true; // set flag found
+            item.style.display = "block";
+            item.classList.add("visible"); 
+            found = true; 
           } else {
             item.style.display = "none";
             item.classList.remove("visible");

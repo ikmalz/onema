@@ -39,7 +39,6 @@
             display: block;
             opacity: 1;
             max-height: 200px;
-            /* Adjust according to content */
         }
 
 
@@ -138,7 +137,6 @@
             display: none;
         }
 
-        /* Animasi untuk modal */
         @keyframes modalShow {
             from {
                 opacity: 0;
@@ -163,7 +161,6 @@
             }
         }
 
-        /* Styling modal untuk animasi */
         #loginModal.show {
             animation: modalShow 0.3s ease-out forwards;
         }
@@ -172,7 +169,6 @@
             animation: modalHide 0.3s ease-in forwards;
         }
 
-        /* Posisi Sidebar di bawah Header */
         #sidebar {
             position: fixed;
             top: 80px;
@@ -186,12 +182,10 @@
             overflow-y: auto;
         }
 
-        /* Sidebar terlihat */
         #sidebar.visible {
             left: 0;
         }
 
-        /* Mengatur ulang grid video dan menggeser konten saat sidebar muncul */
         #main-content {
             transition: 0.5s ease-in-out;
         }
@@ -207,7 +201,6 @@
             padding-left: 1rem;
         }
 
-        /* Tambahkan padding agar video tidak terlalu dekat dengan sidebar */
         #main-content ul li {
             padding-right: 0.5rem;
         }
@@ -233,7 +226,6 @@
             position: relative;
         }
 
-        /* Animasi modal Info */
         @keyframes modalShow {
             from {
                 opacity: 0;
@@ -283,7 +275,6 @@
             animation: fadeInScale 0.3s ease-out forwards;
         }
 
-        /* Animasi Fade-in dan Fade-out */
         .fade-in {
             opacity: 0;
             animation: fadeIn 0.3s forwards;
@@ -366,7 +357,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Animasi untuk muncul */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -411,28 +401,20 @@
             left: 0;
             width: 100%;
             opacity: 0;
-            /* Mulai dengan opacity 0 */
             animation: fadeIn 0.3s ease forwards;
-            /* Terapkan animasi */
             transition: opacity 0.3s ease;
-            /* Transisi untuk perubahan opacity */
         }
 
         #suggestions.hidden {
             opacity: 0;
-            /* Sembunyikan dengan opacity 0 */
             animation: none;
-            /* Hentikan animasi saat tersembunyi */
         }
 
 
         #suggestions.show {
             opacity: 1;
-            /* Opacity penuh saat ditampilkan */
             transform: translateY(0);
-            /* Posisi normal saat ditampilkan */
             animation: fadeIn 0.3s ease;
-            /* Terapkan animasi fade-in */
         }
 
         #suggestions a {
@@ -440,7 +422,6 @@
             text-decoration: none;
             display: block;
             padding: 0.5rem 1rem;
-            /* Padding untuk item saran */
         }
 
         #suggestions a:hover {
@@ -867,14 +848,12 @@
                             @endguest
                         </div>
 
-                        <!-- Kontainer Pengaturan dan Username -->
                         @auth
                         <div class="navbar flex items-center ml-4">
                             <a id="settings-icon" href="#" class="flex items-center">
                                 <i class='bx bxs-category text-white' style="font-size: 24px;"></i>
                             </a>
                         </div>
-                        <!-- Menggabungkan username dan profile photo dalam satu kelas -->
                         <div class="profile flex items-center ml-4">
                             <img src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_path) : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                                 alt="Profile Photo"
@@ -1080,7 +1059,6 @@
          : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                         alt="Profile Photo" />
 
-                    <!-- Ikon Tambah untuk Mengganti Gambar Profil -->
                     @if(Auth::check())
                     <form action="{{ route('update-profile-photo') }}" method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0">
                         @csrf
@@ -1096,7 +1074,6 @@
                 <p class="pt-3 text-lg font-semibold">{{ Auth::user()->username }}</p>
                 <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
 
-                <!-- Tombol Hapus Foto Profil -->
                 @if(Auth::user()->profile_photo_path)
                 <form action="{{ route('delete-profile-photo') }}" method="POST" class="mt-4">
                     @csrf
@@ -1111,7 +1088,6 @@
                 @endif
 
 
-                <!-- Menampilkan pesan sukses atau error -->
                 @if(session('success'))
                 <div class="mt-4 p-2 text-sm text-green-700 bg-green-100 border border-green-400 rounded">
                     {{ session('success') }}
@@ -1189,7 +1165,6 @@
                 </button>
             </div>
             <div class="pt-4">
-                <!-- Language Selection -->
                 <div class="mb-4">
                     <label class="block text-gray-700 dark:text-gray-300 mb-2">Pilih Bahasa:</label>
                     <select id="language-select" class="w-full p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white">
@@ -1197,7 +1172,6 @@
                         <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>English</option>
                     </select>
                 </div>
-                <!-- Theme Selection -->
                 <div>
                     <label class="block text-gray-700 dark:text-gray-300 mb-2">Pilih Tema:</label>
                     <select id="theme-select" class="w-full p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white">
@@ -1507,16 +1481,10 @@
     </div>
     <!-- End modal watchlist -->
 
-
-
-
     <!--home-->
     <div id="main-content">
-        <!-- Slider Section -->
         <div class="flex flex-col lg:flex-row my-8 px-4">
-            <!-- Slider Section -->
             <div class="flex flex-col lg:flex-row my-8 px-4 lg:px-32">
-                <!-- Slider -->
                 <div class="relative w-full lg:w-3/4 lg:mr-16 h-[500px] cursor-pointer overflow-hidden">
                     <div class="slider h-full">
                         <div class="slides h-full flex">
@@ -1588,7 +1556,6 @@
                     <section class="flex flex-col space-y-4 mt-4">
                         @foreach ($recommendations as $recommendation)
                         <div class="flex bg-black bg-opacity-75 rounded-md overflow-hidden h-28 w-full max-w-xs shadow-custom relative">
-                            <!-- Video Thumbnail -->
                             <div class="flex-shrink-0 w-1/4">
                                 <a href="{{ route('home.detail', $recommendation->id) }}">
                                     <video width="100%" height="100%" poster="{{ asset('upload/' . $recommendation->poster) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
@@ -1597,9 +1564,7 @@
                                 </a>
                             </div>
 
-                            <!-- Title and Description -->
                             <div class="flex-1 p-2 flex flex-col justify-center">
-                                <!-- Icon Play & Video Duration -->
                                 <div class="flex items-center justify-start mb-2">
                                     <a href="{{ route('home.detail', $recommendation->id) }}" class="play-button flex items-center mr-1">
                                         <div class="play-icon-container play-icon-small">
@@ -1625,7 +1590,6 @@
             <h1 class="text-black text-xl font-bold px-0 py-2 mb-6 inline-block rounded-r-lg ml-6">
                 <span class="border-l-4 border-red-700 pl-2">Top Onema</span>
             </h1>
-            <!-- Pesan 'Tidak ditemukan' -->
             <div id="no-results-message" class="hidden text-center text-red-500 font-semibold my-6">
                 Tidak ditemukan
             </div>
@@ -1674,17 +1638,14 @@
 
                         <div class="bg-black bg-opacity-75 p-2 rounded-b-lg">
                             <!-- Rating stars -->
-                            <div class="flex items-center text-white text-xs mb-2"> <!-- Tambahkan class `mb-2` untuk memberikan margin bawah -->
-                                <!-- Satu bintang berwarna kuning -->
+                            <div class="flex items-center text-white text-xs mb-2"> 
                                 <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                     <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
                                 </svg>
 
-                                <!-- Tampilkan nilai rating -->
                                 <p class="average-rating ms-1">{{ number_format($trailers->averageRating(), 2) }}</p>
                             </div>
 
-                            <!-- Judul dan konten lainnya -->
                             <h3 class="text-sm">Official trailer</h3>
                             <h3 class="text-lg mt-1 font-semibold mb-2 truncate">{{ $trailers->title }}</h3>
 
@@ -1972,14 +1933,12 @@
             const sliderImages = document.querySelectorAll('.slider img');
             const recommendationVideos = document.querySelectorAll('.flex.flex-col.space-y-4 video');
 
-            // Format Durasi
             function formatDuration(duration) {
                 const minutes = Math.floor(duration / 60);
                 const seconds = Math.floor(duration % 60);
                 return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             }
 
-            // Update Durasi Slider Video
             function updateSliderDuration(video, index) {
                 video.addEventListener('loadedmetadata', function() {
                     const duration = formatDuration(video.duration);
@@ -1990,7 +1949,6 @@
                 });
             }
 
-            // Update Durasi Rekomendasi Video
             function updateRecommendationDuration(video, index) {
                 video.addEventListener('loadedmetadata', function() {
                     const duration = formatDuration(video.duration);
@@ -2001,7 +1959,6 @@
                 });
             }
 
-            // Ambil elemen video dari slider dan tampilkan durasi
             document.querySelectorAll('.slides video').forEach((video, index) => {
                 updateSliderDuration(video, index);
             });
@@ -2206,7 +2163,6 @@
                     });
                 }
 
-                // Tampilkan atau sembunyikan pesan "Tidak ditemukan"
                 const noResultsMessage = document.getElementById('no-results-message');
                 if (!found) {
                     noResultsMessage.classList.remove('hidden');
@@ -2217,15 +2173,14 @@
 
 
 
-            // Tambah riwayat pencarian terbaru di bagian atas
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const query = this.value;
 
                     if (query && !searchHistory.includes(query)) {
-                        searchHistory.unshift(query); // Tambah ke bagian atas
-                        localStorage.setItem('searchHistory', JSON.stringify(searchHistory)); // Simpan di localStorage
+                        searchHistory.unshift(query); 
+                        localStorage.setItem('searchHistory', JSON.stringify(searchHistory)); 
                         updateSearchHistory();
                     }
 
@@ -2233,14 +2188,12 @@
                 }
             });
 
-            // Fungsi hapus riwayat pencarian
             function removeSearchHistory(index) {
                 searchHistory.splice(index, 1);
                 localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
                 updateSearchHistory();
             }
 
-            // Update riwayat pencarian
             function updateSearchHistory() {
                 searchHistoryContainer.innerHTML = '';
 
@@ -2383,7 +2336,6 @@
                 });
             });
 
-            // Kontrol kecepatan
             document.querySelectorAll('.speed-control').forEach(select => {
                 select.addEventListener('change', function() {
                     const video = this.closest('.video-controls').previousElementSibling.querySelector('video');

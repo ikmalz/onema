@@ -218,18 +218,14 @@
     #video-container {
         position: relative;
         text-align: center;
-        /* Center the video */
     }
 
     #like-dislike-container {
         margin-top: 10px;
         justify-content: flex-start;
-        /* Align buttons to the left */
         width: 80%;
-        /* Match the width of the video */
         margin-left: auto;
         margin-right: auto;
-        /* Center the container horizontally */
     }
 
     #like-btn,
@@ -244,24 +240,20 @@
         cursor: pointer;
     }
 
-    /* Style for hovered empty stars */
     .empty-star:hover,
     .empty-star:hover~.empty-star {
         color: yellow;
     }
 
-    /* Default color for empty stars */
     .empty-star {
         color: gray;
         transition: color 0.3s ease;
     }
 
-    /* Selected stars (those that have been rated) */
     .selected {
         color: yellow;
     }
 
-    /* Optional: Prevent filled stars from changing color on hover */
     .selected:hover {
         color: yellow !important;
     }
@@ -464,14 +456,11 @@
 
     <!-- Section for Background Content -->
     <div id="background-container" class="w-full max-w-3xl mx-auto text-white px-6 py-12 rounded-t-lg bg-gray-800 flex flex-col md:flex-row">
-        <!-- Poster Section -->
         <div class="w-full md:w-1/2 mb-4 md:mb-0">
             <img src="{{ asset('upload/' . $detail->poster) }}" alt="Poster Image" class="rounded-lg w-full h-auto object-cover" style="max-height: 500px; object-fit: cover;">
         </div>
 
-        <!-- Content Section -->
         <div class="flex-grow mt-4 md:mt-0 md:ml-6 flex flex-col justify-start">
-            <!-- Title and Genre Section -->
             <div class="mb-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-2">{{$detail->title}}</h2>
                 <p class="text-sm text-gray-400 mb-1">Tanggal Publish: {{$detail->tahun}}</p>
@@ -483,7 +472,6 @@
                 <div class="flex items-center justify-between">
                     <p class="text-xl text-justify text-white font-bold pb-1">Rating</p>
 
-                    <!-- Icon titik tiga (ellipsis) -->
                     <div class="relative">
                         <button id="ellipsis-btn" class="text-white focus:outline-none">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -491,7 +479,6 @@
                             </svg>
                         </button>
 
-                        <!-- Tombol Hapus di Pop-up -->
                         <div id="popup-menu" class="absolute right-0 mt-2 w-24 bg-white text-black rounded-md shadow-lg hidden z-50">
                             <ul>
                                 <li>
@@ -504,7 +491,7 @@
                     </div>
                 </div>
 
-                <!-- Rating Stars -->
+                <!-- Rating  -->
                 <div class="flex items-center text-white">
                     @php
                     $averageRating = $detail->averageRating(); // Menghitung rata-rata rating
@@ -513,7 +500,6 @@
                     $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Bintang kosong
                     @endphp
 
-                    <!-- Tampilkan bintang penuh -->
                     @for ($i = 0; $i < $fullStars; $i++)
                         <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                         <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
@@ -532,14 +518,12 @@
                         </svg>
                         @endif
 
-                        <!-- Tampilkan bintang kosong -->
                         @for ($i = 0; $i < $emptyStars; $i++)
                             <svg class="w-4 h-4 text-gray-300 me-1 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                             <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
                             </svg>
                             @endfor
 
-                            <!-- Tampilkan nilai rating -->
                             <div class="flex items-center text-white">
                                 <p class="average-rating">{{ number_format($averageRating, 2) }}</p>
                                 <p class="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">out of 5</p>
@@ -547,7 +531,7 @@
                 </div>
 
 
-                <!-- Bintang rating jika user belum memberikan rating -->
+                <!-- ini tampilan jika user belum memberi rating guys -->
                 @if (auth()->check() && !$userHasRated)
                 <div id="star-rating" class="flex items-center my-2">
                     @for ($i = 1; $i <= 5; $i++)
@@ -566,7 +550,6 @@
                 <p class="text-gray-400">Login untuk memberikan rating.</p>
                 @endif
 
-                <!-- Hidden Form -->
                 <form id="rating-form" action="{{ route('video.rate', $detail->id) }}" method="POST" class="hidden">
                     @csrf
                     <input type="hidden" name="rating" id="rating-value">
@@ -625,11 +608,9 @@
                             <span class="text-sm font-light">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="relative">
-                            <!-- Ikon titik tiga -->
                             <button id="menu-button-{{ $comment->id }}" class="focus:outline-none">
                                 <i class="bx bx-dots-vertical-rounded text-lg"></i>
                             </button>
-                            <!-- Dropdown menu -->
                             <div id="dropdown-{{ $comment->id }}" class="hidden absolute right-0 mt-2 w-32 bg-white text-black rounded-lg shadow-lg">
                                 <a href="#" class="block px-4 py-2 text-sm hover:bg-red-500 hover:text-white hover:rounded-lg delete-comment" data-id="{{ $comment->id }}">Delete</a>
                             </div>
@@ -758,7 +739,6 @@
                 }
             });
 
-            // Tampilkan atau sembunyikan dropdown saat ikon titik tiga diklik
             document.querySelectorAll('[id^="menu-button-"]').forEach(button => {
                 button.addEventListener('click', function() {
                     let dropdown = document.querySelector('#dropdown-' + this.id.split('-')[2]);
@@ -766,22 +746,18 @@
                 });
             });
 
-            // Simpan data history ke localStorage
             const historyData = {
                 title: document.querySelector('h2').textContent,
-                poster: '{{ asset("upload/" . $detail->poster) }}', // Menggunakan asset untuk mendapatkan URL poster
+                poster: '{{ asset("upload/" . $detail->poster) }}', 
                 genre: document.querySelector('.text-gray-400').textContent,
                 year: document.querySelectorAll('.text-gray-400')[1].textContent,
-                timestamp: Date.now() // Menyimpan timestamp
+                timestamp: Date.now() 
             };
 
-            // Dapatkan history sebelumnya
             let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
 
-            // Tambahkan data baru ke history
             savedHistory.push(historyData);
 
-            // Simpan kembali ke localStorage
             localStorage.setItem('videoHistory', JSON.stringify(savedHistory));
 
 
@@ -850,19 +826,18 @@
 
             // Hapus Rating
             document.getElementById('delete-rating-btn').addEventListener('click', function() {
-                // SweetAlert untuk konfirmasi penghapusan rating
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     text: "Anda akan menghapus rating ini!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33', // Warna tombol konfirmasi (merah)
-                    cancelButtonColor: '#808080', // Warna tombol batal (abu-abu)
+                    confirmButtonColor: '#d33', 
+                    cancelButtonColor: '#808080', 
                     confirmButtonText: 'Ya, hapus!',
                     cancelButtonText: 'Batal',
-                    width: '300px', // Menyusutkan ukuran popup
+                    width: '300px', 
                     customClass: {
-                        popup: 'small-popup bg-gray-800', // Tambahkan class kustom untuk styling background
+                        popup: 'small-popup bg-gray-800', 
                         title: 'popup-title',
                         content: 'popup-content',
                         confirmButton: 'confirm-btn',
@@ -887,16 +862,15 @@
                                         confirmButtonColor: '#d33',
                                         width: '300px',
                                         customClass: {
-                                            popup: 'small-popup bg-gray-800', // Menambahkan class latar belakang di sini juga
+                                            popup: 'small-popup bg-gray-800', 
                                             title: 'popup-title',
                                             content: 'popup-content',
                                             confirmButton: 'confirm-btn'
                                         }
                                     });
 
-                                    // Refresh tampilan untuk menampilkan rating yang terbaru
                                     setTimeout(function() {
-                                        location.reload(); // Menyegarkan halaman untuk memperbarui tampilan
+                                        location.reload(); 
                                     }, 2000);
                                 } else {
                                     Swal.fire({
@@ -923,36 +897,32 @@
 
 
             // Hover rating
-            let selectedRating = 0; // Variabel untuk menyimpan nilai rating yang diklik
+            let selectedRating = 0; 
 
             const stars = document.querySelectorAll('#star-rating .empty-star');
 
             stars.forEach((star, index) => {
-                // On hover
                 star.addEventListener('mouseenter', function() {
                     highlightStars(index);
                 });
 
-                // Reset when mouse leaves
                 star.addEventListener('mouseleave', function() {
-                    if (selectedRating === 0) { // Jika belum ada rating yang dipilih, reset saat mouse leave
+                    if (selectedRating === 0) { 
                         resetStars();
                     } else {
-                        selectStars(selectedRating - 1); // Pastikan bintang yang diklik tetap ter-highlight
+                        selectStars(selectedRating - 1);
                     }
                 });
 
-                // On click, select the stars and lock the rating
                 star.addEventListener('click', function() {
                     selectStars(index);
-                    selectedRating = index + 1; // Simpan rating yang dipilih
+                    selectedRating = index + 1; 
                 });
             });
 
-            // Function to highlight stars on hover
             function highlightStars(index) {
                 stars.forEach((star, i) => {
-                    if (i <= index) { // Highlight dari kiri ke kanan
+                    if (i <= index) { 
                         star.classList.add('selected');
                     } else {
                         star.classList.remove('selected');
@@ -960,21 +930,18 @@
                 });
             }
 
-            // Function to reset stars when not hovering
             function resetStars() {
                 stars.forEach(star => {
                     star.classList.remove('selected');
                 });
             }
 
-            // Function to select and lock the stars when clicked
             function selectStars(index) {
-                selectedRating = index + 1; // Simpan nilai rating yang diklik
-                document.getElementById('rating-value').value = selectedRating; // Set nilai form
+                selectedRating = index + 1; 
+                document.getElementById('rating-value').value = selectedRating; 
 
-                // Highlight bintang yang dipilih secara permanen
                 stars.forEach((star, i) => {
-                    if (i <= index) { // Highlight semua bintang hingga yang dipilih
+                    if (i <= index) { 
                         star.classList.add('selected');
                     } else {
                         star.classList.remove('selected');
@@ -982,29 +949,21 @@
                 });
             }
 
-
-
-
-
             // Rating
             document.querySelectorAll('#star-rating svg').forEach(star => {
                 star.addEventListener('click', function() {
-                    const rating = parseInt(this.getAttribute('data-value')); // Ambil nilai bintang yang diklik
+                    const rating = parseInt(this.getAttribute('data-value')); 
 
-                    // Hapus kelas 'active' dari semua bintang
                     document.querySelectorAll('#star-rating svg').forEach(s => s.classList.remove('active'));
 
-                    // Tambahkan kelas 'active' untuk bintang yang dipilih dan semua bintang sebelumnya (dari kiri ke kanan)
                     document.querySelectorAll('#star-rating svg').forEach(s => {
                         if (parseInt(s.getAttribute('data-value')) <= rating) {
                             s.classList.add('active');
                         }
                     });
 
-                    // Atur nilai rating ke dalam form tersembunyi
                     document.getElementById('rating-value').value = rating;
 
-                    // Kirim data rating ke server menggunakan fetch
                     fetch(`/video/{{ $detail->id }}/rate`, {
                             method: 'POST',
                             headers: {
@@ -1046,15 +1005,13 @@
                                     }
                                 });
 
-                                // Update rata-rata rating di tampilan
                                 const averageRatingElement = document.querySelector('.average-rating');
                                 if (averageRatingElement) {
                                     averageRatingElement.textContent = parseFloat(data.averageRating).toFixed(2);
                                 }
 
-                                // Reload halaman setelah rating berhasil diberikan
                                 setTimeout(function() {
-                                    location.reload(); // Menyegarkan halaman untuk memperbarui tampilan
+                                    location.reload(); 
                                 }, 2000);
                             }
                         })
@@ -1134,7 +1091,6 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        // Menghapus pesan "Belum ada komentar" jika ada
                         $('.no-comments').remove();
 
                         const newComment = `
@@ -1168,8 +1124,7 @@
                         $('#chat-messages').append(newComment);
                         $('#comment-form')[0].reset();
 
-                        // Refresh halaman setelah komentar dikirim
-                        location.reload(); // Tambahkan ini untuk refresh halaman
+                        location.reload(); 
                     },
                     error: function(xhr) {
                         console.error('Gagal mengirim komentar:', xhr.statusText);
@@ -1198,15 +1153,13 @@
                     success: function(response) {
                         console.log(response.message);
 
-                        // Update UI untuk like
                         if (response.status === 'liked') {
                             likeButton.find('i').addClass('text-red-600');
-                            dislikeButton.find('i').removeClass('text-red-600'); // Hapus warna dislike jika ada
+                            dislikeButton.find('i').removeClass('text-red-600'); 
                         } else {
                             likeButton.find('i').removeClass('text-red-600');
                         }
 
-                        // Update jumlah like dan dislike
                         likeCountSpan.text(response.likeCount);
                         dislikeCountSpan.text(response.dislikeCount);
                     },
@@ -1233,15 +1186,13 @@
                     success: function(response) {
                         console.log(response.message);
 
-                        // Update UI untuk dislike
                         if (response.status === 'disliked') {
                             dislikeButton.find('i').addClass('text-red-600');
-                            likeButton.find('i').removeClass('text-red-600'); // Hapus warna like jika ada
+                            likeButton.find('i').removeClass('text-red-600'); 
                         } else {
                             dislikeButton.find('i').removeClass('text-red-600');
                         }
 
-                        // Update jumlah like dan dislike
                         dislikeCountSpan.text(response.dislikeCount);
                         likeCountSpan.text(response.likeCount);
                     },
@@ -1255,25 +1206,20 @@
 
 
 
-            // Toggle reply form visibility when 'Balas' button is clicked
             $(document).on('click', '.reply-btn', function() {
                 let commentId = $(this).data('id');
 
-                // Toggle the reply form visibility
                 $('#reply-form-' + commentId).toggleClass('hidden');
             });
 
-            // Handle the cancel button click
             $(document).on('click', '.cancel-reply-btn', function() {
                 let commentId = $(this).data('id');
 
-                // Hide the reply form
                 $('#reply-form-' + commentId).addClass('hidden');
             });
 
-            // Handle sending the reply
             $(document).on('submit', '.reply-form', function(event) {
-                event.preventDefault(); // Prevent form from submitting normally
+                event.preventDefault(); 
 
                 let form = $(this);
                 let commentId = form.data('id');
@@ -1292,7 +1238,6 @@
                         reply: replyInput
                     },
                     success: function(response) {
-                        // Append the new reply before the form
                         const newReply = `
                                     <div class="replies p-2 ml-12">
 
@@ -1319,9 +1264,9 @@
                 </div>
                 </div>
             `;
-                        form.before(newReply); // Append the new reply before the form
-                        form.find('.reply-input').val(''); // Clear the input field
-                        form.addClass('hidden'); // Hide the form after submission
+                        form.before(newReply); 
+                        form.find('.reply-input').val('');
+                        form.addClass('hidden'); 
                     },
                     error: function(xhr) {
                         console.error('Gagal mengirim balasan:', xhr.statusText);

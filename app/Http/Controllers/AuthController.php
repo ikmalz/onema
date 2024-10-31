@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage; // Tambahkan ini
+use Illuminate\Support\Facades\Storage; 
 
 
 class AuthController extends Controller
@@ -46,7 +46,6 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validasi input
         $request->validate([
             'username' => 'required|min:5',
             'email' => 'required|email|unique:users,email',
@@ -54,17 +53,14 @@ class AuthController extends Controller
         ]);
 
 
-        // Buat pengguna baru
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Login pengguna
         auth()->login($user);
 
-        // Redirect ke halaman home
         return redirect()->route('login');
     }
 
