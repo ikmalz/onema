@@ -48,7 +48,6 @@ Route::post('/comment/{id}/like', [HomeController::class, 'toggleLikeComment'])-
 Route::post('/comment/{id}/dislike', [HomeController::class, 'toggleDislikeComment'])->name('comment.dislike');
 Route::delete('/comments/{id}', [HomeController::class, 'deleteComment'])->name('comments.delete');
 
-
 Route::post('/video/{id}/like', [HomeController::class, 'likeVideo'])->name('video.like');
 Route::post('/video/{id}/dislike', [HomeController::class, 'dislikeVideo'])->name('video.dislike');
 
@@ -64,21 +63,7 @@ Route::delete('/delete-profile-photo', [AuthController::class, 'deleteProfilePho
 Route::delete('/profile/photo', [AuthController::class, 'deleteProfilePhoto'])->name('delete-profile-photo');
 Route::post('/delete-profile-photo', [AuthController::class, 'deleteProfilePhoto'])->name('delete-profile-photo');
 
-Route::get('/lang/{lang}', function ($lang) {
-    App::setLocale($lang);
-    return response()->json([
-        'settings' => __('messages.settings'),
-        'select_language' => __('messages.select_language'),
-        'select_theme' => __('messages.select_theme'),
-        'save' => __('messages.save'),
-        'light' => __('messages.light'),
-        'dark' => __('messages.dark'),
-        'english' => __('messages.english'),
-        'indonesian' => __('messages.indonesian'),
-    ]);
-});
 
-Route::post('/change-language', [HomeController::class, 'changeLanguage'])->name('changeLanguage');
 
 
 

@@ -1062,7 +1062,7 @@
     <!--end modal form-->
 
     <!-- Akun -->
-    <div id="akun-popup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center transition-opacity duration-300 opacity-0">
+    <div id="akun-popup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center transition-opacity duration-300 opacity-0" style="z-index: 1999;">
         <div id="akun-popup-content" class="transform transition-transform duration-300 scale-95 bg-white max-w-md rounded-lg overflow-hidden shadow-lg relative">
             <button id="close-akun-popup" class="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -1130,7 +1130,6 @@
                     </ul>
                 </div>
                 @endif
-
 
                 <!-- Daftar Akun -->
                 <div class="mt-5">
@@ -1626,6 +1625,10 @@
             <h1 class="text-black text-xl font-bold px-0 py-2 mb-6 inline-block rounded-r-lg ml-6">
                 <span class="border-l-4 border-red-700 pl-2">Top Onema</span>
             </h1>
+            <!-- Pesan 'Tidak ditemukan' -->
+            <div id="no-results-message" class="hidden text-center text-red-500 font-semibold my-6">
+                Tidak ditemukan
+            </div>
             <section>
                 <ul class="mt-8 grid grid-flow-row-dense gap-4 sm:grid-cols-3 lg:grid-cols-6">
                     @foreach ($topOnema as $trailers)
@@ -2109,16 +2112,20 @@
             const searchHistoryContainer = document.getElementById('search-history');
             const searchContainer = document.querySelector('.relative.flex-1');
 
-            let searchHistory = [];
+            let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
             searchInput.addEventListener('input', function() {
                 const searchQuery = this.value.toLowerCase();
 
                 if (searchQuery) {
                     searchHistoryContainer.classList.add('hidden');
+                    updateSuggestions(searchQuery);
+                } else {
+                    if (searchHistory.length > 0) {
+                        updateSearchHistory();
+                    }
+                    suggestions.classList.add('hidden');
                 }
-
-                updateSuggestions(searchQuery);
             });
 
             searchInput.addEventListener('focus', function() {
@@ -2134,6 +2141,7 @@
                 }
             });
 
+            // Update saran pencarian berdasarkan input
             function updateSuggestions(query) {
                 suggestions.innerHTML = '';
 
@@ -2145,18 +2153,11 @@
 
                     trailers.forEach(function(trailer) {
                         const title = trailer.getAttribute('data-title').toLowerCase();
-                        const posterUrl = trailer.getAttribute('data-poster');
 
                         if (title.includes(query) && !addedTitles.includes(title)) {
                             const suggestionItem = document.createElement('a');
                             suggestionItem.href = '#';
                             suggestionItem.className = 'suggestion-item hover:bg-gray-100 p-2 block';
-
-                            const posterImg = document.createElement('img');
-                            posterImg.src = posterUrl;
-                            posterImg.alt = 'Poster';
-                            posterImg.className = 'w-10 h-10 mr-2 inline-block';
-                            suggestionItem.appendChild(posterImg);
 
                             const titleText = document.createElement('span');
                             titleText.textContent = trailer.getAttribute('data-title');
@@ -2183,12 +2184,16 @@
                 }
             }
 
+            // Fungsi pencarian
             function performSearch(query) {
                 const trailers = document.querySelectorAll('li[data-title]');
+                let found = false;
+
                 trailers.forEach(function(trailer) {
                     const title = trailer.getAttribute('data-title').toLowerCase();
                     if (title.includes(query.toLowerCase())) {
                         trailer.classList.remove('hidden');
+                        found = true;
                     } else {
                         trailer.classList.add('hidden');
                     }
@@ -2200,15 +2205,27 @@
                         behavior: 'smooth'
                     });
                 }
+
+                // Tampilkan atau sembunyikan pesan "Tidak ditemukan"
+                const noResultsMessage = document.getElementById('no-results-message');
+                if (!found) {
+                    noResultsMessage.classList.remove('hidden');
+                } else {
+                    noResultsMessage.classList.add('hidden');
+                }
             }
 
+
+
+            // Tambah riwayat pencarian terbaru di bagian atas
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const query = this.value;
 
                     if (query && !searchHistory.includes(query)) {
-                        searchHistory.push(query);
+                        searchHistory.unshift(query); // Tambah ke bagian atas
+                        localStorage.setItem('searchHistory', JSON.stringify(searchHistory)); // Simpan di localStorage
                         updateSearchHistory();
                     }
 
@@ -2216,20 +2233,42 @@
                 }
             });
 
+            // Fungsi hapus riwayat pencarian
+            function removeSearchHistory(index) {
+                searchHistory.splice(index, 1);
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+                updateSearchHistory();
+            }
+
+            // Update riwayat pencarian
             function updateSearchHistory() {
                 searchHistoryContainer.innerHTML = '';
+
+                if (searchHistory.length === 0) {
+                    searchHistoryContainer.classList.add('hidden');
+                    return;
+                }
+
                 searchHistory.forEach(function(item, index) {
                     const historyItem = document.createElement('div');
-                    historyItem.className = 'flex justify-between items-center p-2';
+                    historyItem.className = 'flex justify-between items-center p-2 cursor-pointer';
 
                     const historyText = document.createElement('span');
                     historyText.textContent = item;
                     historyItem.appendChild(historyText);
 
+                    historyItem.addEventListener('click', function() {
+                        searchInput.value = item;
+                        performSearch(item);
+                        searchHistoryContainer.classList.add('hidden');
+                    });
+
                     const deleteButton = document.createElement('button');
                     deleteButton.innerHTML = "<i class='bx bx-x text-red-500 text-3xl'></i>";
                     deleteButton.className = 'ml-2 text-red-600 hover:underline';
-                    deleteButton.addEventListener('click', function() {
+
+                    deleteButton.addEventListener('click', function(e) {
+                        e.stopPropagation();
                         removeSearchHistory(index);
                     });
 
@@ -2240,10 +2279,8 @@
                 searchHistoryContainer.classList.remove('hidden');
             }
 
-            function removeSearchHistory(index) {
-                searchHistory.splice(index, 1);
-                updateSearchHistory();
-            }
+
+
 
 
             //tambah

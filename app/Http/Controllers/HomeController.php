@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trailer;
-use App\Models\Comment; // Tambahkan ini
+use App\Models\Comment; 
 use App\Models\Dislike;
-use App\Models\LikeComment; // Tambahkan ini jika Anda juga menggunakan model untuk likes
-use App\Models\DislikeComment; // Tambahkan ini jika Anda juga menggunakan model untuk likes
+use App\Models\LikeComment; 
+use App\Models\DislikeComment; 
 use App\Models\Reply;
 use App\Models\Watchlist;
 use App\Models\User;
@@ -24,7 +24,7 @@ class HomeController extends Controller
         $slider = DB::table('_trailer')->inRandomOrder()->get();
         $recommendations = DB::table('_trailer')->inRandomOrder()->limit(3)->get();
         $topOnema = Trailer::withCount(['likes', 'dislikes'])
-            ->with('ratings') // Muat relasi rating
+            ->with('ratings') 
             ->orderBy('populer', 'desc')
             ->get();
 
@@ -35,8 +35,6 @@ class HomeController extends Controller
 
         return view('home.homepage', compact('slider', 'recommendations', 'topOnema', 'availableAccounts', 'watchlistItems'));
     }
-
-
 
     public function ikmal()
     {
@@ -50,7 +48,7 @@ class HomeController extends Controller
             'gridDeskripsi' => 'required|string',
             'gridVidio' => 'required|file|mimes:mp4,mov,avi,wmv|max:27480',
             'gridPoster' => 'required|mimes:jpeg,png,jpg,gif,svg,webp|max:2548',
-            'gridThumbnail' => 'required|mimes:jpeg,png,jpg,gif,svg,webp|max:2548', // Validasi thumbnail
+            'gridThumbnail' => 'required|mimes:jpeg,png,jpg,gif,svg,webp|max:2548', 
             'gridTahun' => 'required|integer',
             'gridOpsi' => 'required|string',
         ]);
@@ -59,18 +57,18 @@ class HomeController extends Controller
 
             $videoName = $request->file('gridVidio')->getClientOriginalName();
             $posterName = $request->file('gridPoster')->getClientOriginalName();
-            $thumbnailName = $request->file('gridThumbnail')->getClientOriginalName(); // Ambil nama file thumbnail
+            $thumbnailName = $request->file('gridThumbnail')->getClientOriginalName(); 
 
             $request->file('gridVidio')->move(public_path() . '/upload', $videoName);
             $request->file('gridPoster')->move(public_path() . '/upload', $posterName);
-            $request->file('gridThumbnail')->move(public_path() . '/upload', $thumbnailName); // Simpan thumbnail
+            $request->file('gridThumbnail')->move(public_path() . '/upload', $thumbnailName); 
 
             DB::table('_trailer')->insert([
                 'title' => $request->input('gridTitle'),
                 'deskripsi' => $request->input('gridDeskripsi'),
                 'vidio' => $videoName,
                 'poster' => $posterName,
-                'thumbnail' => $thumbnailName, // Simpan nama thumbnail ke database
+                'thumbnail' => $thumbnailName, 
                 'tahun' => $request->input('gridTahun'),
                 'populer' => $request->input('gridOpsi'),
             ]);
@@ -115,9 +113,6 @@ class HomeController extends Controller
         }
     }
 
-
-
-
     //komentar
     public function show($id)
     {
@@ -140,9 +135,6 @@ class HomeController extends Controller
     
         return view('home.detail', compact('detail', 'comments', 'userHasRated'));
     }
-    
-
-
 
     public function storeComment(Request $request, $trailer_id)
     {
@@ -157,7 +149,6 @@ class HomeController extends Controller
         ]);
 
         if ($request->ajax()) {
-            // Mendapatkan foto profil pengguna
             $profilePhoto = auth()->user()->profile_photo_path
                 ? asset('storage/' . auth()->user()->profile_photo_path)
                 : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg';
@@ -196,13 +187,11 @@ class HomeController extends Controller
             return response()->json(['message' => 'Comment not found'], 404);
         }
 
-        // Hapus dislike jika ada
         $existingDislike = DislikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
         if ($existingDislike) {
             $existingDislike->delete();
         }
 
-        // Cek apakah sudah like, jika iya hapus like
         $existingLike = LikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
         if ($existingLike) {
             $existingLike->delete();
@@ -214,7 +203,6 @@ class HomeController extends Controller
             ], 200);
         }
 
-        // Jika belum like, tambahkan like
         LikeComment::create([
             'user_id' => $user->id,
             'comment_id' => $commentId,
@@ -237,13 +225,11 @@ class HomeController extends Controller
             return response()->json(['message' => 'Comment not found'], 404);
         }
 
-        // Hapus like jika ada
         $existingLike = LikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
         if ($existingLike) {
             $existingLike->delete();
         }
 
-        // Cek apakah sudah dislike, jika iya hapus dislike
         $existingDislike = DislikeComment::where('user_id', $user->id)->where('comment_id', $commentId)->first();
         if ($existingDislike) {
             $existingDislike->delete();
@@ -255,7 +241,6 @@ class HomeController extends Controller
             ], 200);
         }
 
-        // Jika belum dislike, tambahkan dislike
         DislikeComment::create([
             'user_id' => $user->id,
             'comment_id' => $commentId,
@@ -286,7 +271,7 @@ class HomeController extends Controller
             'reply' => $reply->reply,
             'created_at' => $reply->created_at->diffForHumans(),
             'profile_photo_path' => auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
-            'reply_id' => $reply->id, // Mengirimkan ID balasan untuk penggunaan di frontend
+            'reply_id' => $reply->id, 
         ]);
     }
 
@@ -318,7 +303,6 @@ class HomeController extends Controller
             'rating' => $request->rating,
         ]);
 
-        // Kembalikan rata-rata rating terbaru setelah rating berhasil
         return response()->json([
             'message' => 'Rating berhasil diberikan.',
             'averageRating' => $trailer->averageRating(),
@@ -351,23 +335,18 @@ class HomeController extends Controller
         ]);
     }
 
-
-
     public function toggleWatchlist(Request $request, $trailerId)
     {
         $userId = auth()->id();
 
-        // Cek apakah trailer sudah ada di watchlist user
         $existingWatchlist = Watchlist::where('user_id', $userId)
             ->where('trailer_id', $trailerId)
             ->first();
 
         if ($existingWatchlist) {
-            // Jika sudah ada, hapus dari watchlist
             $existingWatchlist->delete();
             return response()->json(['status' => 'removed']);
         } else {
-            // Jika belum ada, tambahkan ke watchlist
             Watchlist::create([
                 'user_id' => $userId,
                 'trailer_id' => $trailerId,
@@ -390,10 +369,10 @@ class HomeController extends Controller
     {
         $lang = $request->input('lang');
         if (in_array($lang, ['en', 'id'])) {
-            session(['language' => $lang]); // Mengubah session key menjadi 'language'
+            session(['language' => $lang]);
             App::setLocale($lang);
         }
 
-        return redirect()->back(); // Kembali ke halaman sebelumnya
+        return redirect()->back(); 
     }
 }
