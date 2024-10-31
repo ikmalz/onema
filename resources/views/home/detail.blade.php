@@ -494,10 +494,10 @@
                 <!-- Rating  -->
                 <div class="flex items-center text-white">
                     @php
-                    $averageRating = $detail->averageRating(); // Menghitung rata-rata rating
-                    $fullStars = floor($averageRating); // Bintang penuh
-                    $halfStar = $averageRating - $fullStars >= 0.5 ? true : false; // Setengah bintang
-                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Bintang kosong
+                    $averageRating = $detail->averageRating(); 
+                    $fullStars = floor($averageRating); 
+                    $halfStar = $averageRating - $fullStars >= 0.5 ? true : false; 
+                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
                     @endphp
 
                     @for ($i = 0; $i < $fullStars; $i++)

@@ -59,17 +59,14 @@
               <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class='bx bx-tv'></i> TV Episodes</a>
             </div>
 
-            <!-- Kontainer Pencarian -->
             <div class="relative flex-1 flex items-center">
               <input id="search-input" type="text" class="pl-10 pr-12 py-2 text-sm border rounded-r-md h-10 w-full" placeholder="Search..." />
               <i class='bx bx-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-2xl'></i>
 
-              <!-- Kontainer Saran Pencarian -->
               <div id="suggestions" class="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden z-50">
 
               </div>
 
-              <!-- Kontainer Riwayat Pencarian -->
               <div id="search-history" class="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden z-50">
 
               </div>
@@ -87,7 +84,6 @@
               </a>
             </div>
 
-            <!-- Kontainer Login/Logout -->
             <div class="flex items-center ml-4">
               @guest
               <a class="buy p-2 font-semibold text-sm bg-red-600 text-white rounded" href="{{ route('login') }}">Login</a>
@@ -102,7 +98,6 @@
               @endguest
             </div>
 
-            <!-- Kontainer Pengaturan dan Username -->
             @auth
             <div class="navbar flex items-center ml-4">
               <a id="settings-icon" href="#" class="flex items-center">
