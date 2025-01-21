@@ -72,4 +72,9 @@ class Trailer extends Model
     {
         return $this->hasMany(Watchlist::class);
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

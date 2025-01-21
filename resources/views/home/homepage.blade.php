@@ -118,18 +118,21 @@
         }
 
         #popup-overlay {
-            transform: translateY(-100%);
-            transition: transform 0.5s ease;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
             z-index: 1999;
         }
 
         #popup-overlay.active {
-            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         #popup-overlay.closing {
-            transform: translateY(-100%);
+            opacity: 0;
         }
+
 
 
 
@@ -769,6 +772,93 @@
             opacity: 0;
             transform: scale(0.95);
         }
+
+        body.light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        body.light .text-content {
+            color: #333333;
+        }
+
+        body.dark {
+            background-color: #252525;
+            color: #ffffff;
+        }
+
+        body.dark .text-content {
+            color: #aaaaaa;
+        }
+
+        body.dark-mode .text-dark {
+            color: white;
+        }
+
+        body.dark-mode .text-dark-muted {
+            color: #e2e8f0;
+        }
+
+        @media (max-width: 1024px) {
+
+            .slider,
+            .slide {
+                width: 100%;
+            }
+
+            .poster-container {
+                margin-right: 16px;
+            }
+
+            .play-button,
+            .play-button1 {
+                width: 48px;
+                height: 48px;
+            }
+
+            .info-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .info-content p {
+                font-size: 0.875rem;
+            }
+
+            .sidebar-open .slider-container {
+                padding-left: 300px;
+            }
+
+        }
+
+        .text-content {
+            padding-left: 16px;
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar-open .text-content {
+                padding-left: 300px;
+            }
+        }
+
+        body.dark .backgroundd {
+            background-color: #333333;
+        }
+
+        body.light .backgroundd {
+            background-color: #333333;
+        }
+
+        body.light .gudeg {
+            color: #4b5563;
+        }
+
+        body.dark .gudeg {
+            color: #f0f0f0;
+        }
+
+        #historyContainer .flex.items-center.justify-center.h-full {
+            height: 100%;
+        }
     </style>
     <script>
         $.ajaxSetup({
@@ -779,11 +869,16 @@
     </script>
 </head>
 
-<body class="font-poppins">
+<body class="font-poppins {{ session('theme', 'light') }}" id="bodyTheme">
     <!--header-->
     <header class="bg-[#E52B09] sticky top-0 z-50">
         <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
+                <div class="navbar flex items-center ml-4">
+                    <a id="settings-icon" href="#" class="flex items-center">
+                        <i class='bx bxs-category text-white' style="font-size: 24px;"></i>
+                    </a>
+                </div>
                 <div class="flex items-center gap-4">
                     <a class="block text-teal-600" href="#">
                         <span class="sr-only">Home</span>
@@ -840,16 +935,10 @@
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 Logout
                             </a>
-
                             @endguest
                         </div>
 
                         @auth
-                        <div class="navbar flex items-center ml-4">
-                            <a id="settings-icon" href="#" class="flex items-center">
-                                <i class='bx bxs-category text-white' style="font-size: 24px;"></i>
-                            </a>
-                        </div>
                         <div class="profile flex items-center ml-4">
                             <img src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_path) : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                                 alt="Profile Photo"
@@ -875,51 +964,49 @@
     <!--end header-->
 
     <!--info -->
-    <div id="info-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-4xl"> <!-- Ubah max-w-lg menjadi max-w-4xl -->
-            <div class="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+    <div id="info-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" style="z-index: 1999;">
+        <div class="bg-[#363434] p-6 rounded-lg shadow-lg w-full max-w-4xl">
+            <div class="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-[#363434] dark:text-blue-400" role="alert">
                 <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                 </svg>
                 <span class="sr-only">Info</span>
                 <div>
-                    <span class="font-medium">Persyaratan untuk ulasan film:</span>
+                    <span class="font-medium">@lang('messages.Requirements_for_movie_reviews')</span>
                     <ul class="mt-1.5 list-disc list-inside">
-                        <li>Minimal 10 karakter untuk ulasan.</li>
-                        <li>Setidaknya satu karakter huruf kecil.</li>
-                        <li>Termasuk satu karakter khusus, misalnya ! @ # ?</li>
+                        <li>@lang('messages.minimumcharacter')</li>
+                        <li>@lang('messages.At_least')</li>
+                        <li>@lang('messages.includeon')</li>
                     </ul>
                 </div>
             </div>
-            <div class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+            <div class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-[#363434] dark:text-red-400" role="alert">
                 <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                 </svg>
-                <span class="sr-only">Peringatan</span>
+                <span class="sr-only">@lang('messages.warning')</span>
                 <div>
-                    <span class="font-medium">Perhatikan bahwa:</span>
+                    <span class="font-medium">@lang('messages.Pleasenote')</span>
                     <ul class="mt-1.5 list-disc list-inside">
-                        <li>Ulasan yang tidak memenuhi syarat tidak akan dipublikasikan.</li>
-                        <li>Pastikan untuk tidak menggunakan bahasa yang kasar atau tidak pantas.</li>
-                        <li>Ulasan harus relevan dengan film yang diulas.</li>
+                        <li>@lang('messages.reviewthat')</li>
+                        <li>@lang('messages.please').</li>
+                        <li>@lang('messages.must').</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Bagian Ulasan Film -->
             <div class="mt-4 text-justify">
-                <h3 class="text-lg font-bold text-red-500">Ulasan Film</h3>
+                <h3 class="text-lg font-bold text-red-500">Movie Review</h3>
                 <p class="mt-2 text-gray-400">
-                    Tolong luangkan waktu sejenak untuk memberikan rating yang jujur dan konstruktif setelah menonton video trailer ini, karena setiap pendapat Anda sangat berarti dan dapat membantu pengguna lain dalam menentukan pilihan yang tepat sesuai dengan preferensi mereka. Dengan memberikan penilaian yang sesuai,
-                    Anda berperan dalam menciptakan lingkungan yang informatif dan membantu orang lain menemukan konten yang benar-benar mereka nikmati, sehingga pengalaman menonton menjadi lebih menyenangkan dan bermanfaat." </p>
+                    @lang('messages.take')
+                </p>
                 <p class="mt-2 text-gray-400">
-                    "Selain itu, kami sangat menghargai partisipasi Anda dalam komunitas kami, karena setiap rating tidak hanya mempengaruhi konten yang ditampilkan, tetapi juga memberikan masukan berharga bagi kami untuk terus meningkatkan kualitas layanan yang kami tawarkan.
-                    Dengan berbagi pendapat dan pengalaman Anda, Anda turut berkontribusi dalam pengembangan platform ini, menjadikannya tempat yang lebih baik bagi semua pengguna yang mencari informasi dan hiburan yang berkualitas."
+                    @lang('messages.we')
                 </p>
             </div>
 
-            <button id="close-info-modal" class="mt-4 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Mengerti
+            <button id="close-info-modal" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                @lang('messages.understand')
             </button>
         </div>
     </div>
@@ -993,7 +1080,7 @@
                 </div>
 
 
-                <!-- Tahun Rilis, Genre, dan Tombol Kirim -->
+                <!-- Tahun Rilis -->
                 <div class="flex flex-wrap -mx-3 mb-6">
                     <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-release-year">
@@ -1067,7 +1154,7 @@
                 </div>
 
                 @if(Auth::check())
-                <p class="pt-3 text-lg font-semibold">{{ Auth::user()->username }}</p>
+                <p class="pt-3 text-lg font-semibold text-gray-600">{{ Auth::user()->username }}</p>
                 <p class="text-sm text-gray-600">{{ Auth::user()->email }}</p>
 
                 @if(Auth::user()->profile_photo_path)
@@ -1149,102 +1236,71 @@
     </div>
     <!-- end Akun -->
 
-    <!-- Modal Settings -->
-    <div id="settings-modal" class="fixed inset-0 hidden z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800 p-4 max-w-lg w-full">
-            <div class="flex justify-between items-center pb-2 border-b">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Settings</h3>
-                <button id="close-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="pt-4">
-                <div class="mb-4">
-                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Pilih Bahasa:</label>
-                    <select id="language-select" class="w-full p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                        <option value="id" {{ app()->getLocale() == 'id' ? 'selected' : '' }}>Bahasa Indonesia</option>
-                        <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>English</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Pilih Tema:</label>
-                    <select id="theme-select" class="w-full p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                        <option value="light">Putih</option>
-                        <option value="dark">Hitam</option>
-                    </select>
-                </div>
-            </div>
-            <div class="flex justify-end pt-4">
-                <button id="close-modal-button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Simpan</button>
-            </div>
-        </div>
-    </div>
-    <!-- end setting -->
+    <!-- Popup -->
+    <div id="popup-overlay" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-[#363434] w-3/4 h-3/4 relative overflow-auto p-4 rounded-lg">
+            <!-- Close Button -->
+            <i id="close-popup" class="bx bx-x absolute top-2 right-2 cursor-pointer text-white bg-red-500 rounded-full p-2 w-8 h-8 flex items-center justify-center"></i>
 
-    <!---pop up-->
-    <div id="popup-overlay" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center z-50 overflow-hidden">
-        <div class="bg-[#363434] p-8 rounded-lg w-full h-full relative flex flex-col">
-            <i id="close-popup" class='bx bx-x absolute top-4 right-4 cursor-pointer text-white bg-red-500 rounded-full p-2 w-10 h-10 flex items-center justify-center'></i>
-            <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full overflow-auto">
-                <div class="flex justify-center items-center p-2">
-                    <img src="../asset/foto/logo_onema-removebg(1).png" alt="" class="w-64 h-64 object-cover">
-                </div>
-                <div class="flex flex-col justify-between p-4">
-                    <div class="flex flex-col space-y-4">
-                        <div class="flex space-x-4 mt-80">
-                            <i class='bx bx-film text-red-500 text-3xl'></i>
-                            <div>
-                                <h3 class="text-lg font-bold text-gray-300 pb-5">Movie Review</h3>
-                                <p class="text-sm text-gray-400 font-semibold pb-5">
-                                    Latest Reviews <br> <br>
-                                    Top Rated Movies <br> <br>
-                                    Most Popular Reviews
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex space-x-4">
-                            <i class='bx bx-film text-red-500 text-3xl'></i>
-                            <div>
-                                <h3 class="text-lg font-bold text-gray-300 pb-5">Movie Review</h3>
-                                <p class="text-sm text-gray-400 font-semibold">
-                                    Latest Reviews <br> <br>
-                                    Top Rated Movies <br> <br>
-                                    Most Popular Reviews
-                                </p>
-                            </div>
-                        </div>
+            <!-- Popup Content -->
+            <div class="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+                <!-- Pilihan Film -->
+                <div class="flex items-start p-4 bg-[#2c2a2a] rounded-md cursor-pointer hover:bg-[#393737]" onclick="filterContent('rating_tertinggi')">
+                    <i class="bx bx-film text-red-500 text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-300 mb-2">Pilihan Film</h3>
+                        <p class="text-sm text-gray-400">
+                            <span>- Rekomendasi Terbaik:</span><br>
+                            <span>- Rating Tertinggi Sepanjang Masa</span><br>
+                            <span>- Film yang Sedang Tren</span>
+                        </p>
                     </div>
                 </div>
-                <div class="flex flex-col justify-between p-4 -mt-25">
-                    <div class="flex space-x-4">
-                        <i class='bx bx-film text-red-500 text-3xl'></i>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-300 pb-5">Movie Review</h3>
-                            <p class="text-sm text-gray-400 font-semibold pb-2">
-                                Latest Reviews <br> <br>
-                                Top Rated Movies <br> <br>
-                                Most Popular Reviews
-                            </p>
-                        </div>
+
+                <!-- Film Terbaru -->
+                <div class="flex items-start p-4 bg-[#2c2a2a] rounded-md cursor-pointer hover:bg-[#393737]" onclick="filterContent('film_terbaru')">
+                    <i class="bx bx-film text-red-500 text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-300 mb-2">Film Terbaru:</h3>
+                        <p class="text-sm text-gray-400">
+                            <span>- Genre Komedi, Drama, dan Aksi</span><br>
+                            <span>- Paling Banyak Ditonton</span><br>
+                            <span>- Favorit Penonton</span>
+                        </p>
                     </div>
-                    <div class="flex space-x-4">
-                        <i class='bx bx-tv text-red-500 text-3xl'></i>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-300 pb-5">TV Show</h3>
-                            <p class="text-sm text-gray-400 font-semibold">
-                                Latest Episodes <br> <br>
-                                Top Rated Shows <br> <br>
-                                Most Popular Shows
-                            </p>
-                        </div>
+                </div>
+
+                <!-- Film Populer -->
+                <div class="flex items-start p-4 bg-[#2c2a2a] rounded-md cursor-pointer hover:bg-[#393737]" onclick="filterContent('film_populer')">
+                    <i class="bx bx-film text-red-500 text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-300 mb-2">Film Populer:</h3>
+                        <p class="text-sm text-gray-400">
+                            <span>- Genre Terbaru dan Klasik</span><br>
+                            <span>- Paling Banyak Dibicarakan</span><br>
+                            <span>- Film Pilihan Penonton</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Serial TV -->
+                <div class="flex items-start p-4 bg-[#2c2a2a] rounded-md cursor-pointer hover:bg-[#393737]" onclick="filterContent('serial_tv')">
+                    <i class="bx bx-tv text-red-500 text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-300 mb-2">Serial TV:</h3>
+                        <p class="text-sm text-gray-400">
+                            <span>- Episode Baru Setiap Minggu</span><br>
+                            <span>- Rating Tertinggi</span><br>
+                            <span>- Acara yang Wajib Ditonton</span>
+                        </p>
                     </div>
                 </div>
             </div>
+            <!-- End Popup Content -->
         </div>
     </div>
-    <!--end pop up-->
+    <!-- End Popup -->
+
 
     <!-- side bar -->
     <aside id="sidebar" class="sidebar-hidden fixed top-0 left-0 z-40 w-64 h-screen">
@@ -1256,8 +1312,8 @@
                         <!-- Foto Profil di Sebelah Kiri (Ukuran lebih besar) -->
                         <img class="h-14 w-14 rounded-full mr-2 object-cover"
                             src="{{ auth()->check() && auth()->user()->profile_photo_path 
-           ? asset('storage/' . auth()->user()->profile_photo_path) 
-           : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
+                                 ? asset('storage/' . auth()->user()->profile_photo_path) 
+                                 : 'https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg' }}"
                             alt="Profile Photo" />
 
                         <span class="flex-1 text-sm ms-2 whitespace-nowrap">
@@ -1272,8 +1328,7 @@
                     <hr class="border-t border-gray-500 w-full mx-0 my-2">
 
                     <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">
-                        GENERAL
-                    </span>
+                        @lang('messages.general') </span>
                 </li>
 
                 <li>
@@ -1281,7 +1336,7 @@
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M6 2l12 4v12l-12-4V2Zm1 2v7.5l8 2.5V4.5l-8-2.5ZM4 8v11l12 4v-2l-10-3.333V7.667L4 8Zm2 3.5V19l10 3v-3.5l-8-2.5V11.5Z" />
                         </svg>
-                        <span class="ms-3 text-sm">My Collection</span>
+                        <span class="ms-3 text-sm">@lang('messages.my_collection')</span>
                     </a>
                 </li>
                 <li>
@@ -1290,7 +1345,7 @@
                             <path fill-rule="evenodd" d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5A8.5 8.5 0 0 0 12 3.5ZM2 12A10 10 0 1 1 12 22 10 10 0 0 1 2 12Zm10.25-.75V7a.75.75 0 1 0-1.5 0v5a.75.75 0 0 0 .75.75h4a.75.75 0 0 0 0-1.5Z" />
                             <path d="M7.75 4.75a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.06-1.06Z" />
                         </svg>
-                        <span class="ms-3 text-sm">History</span>
+                        <span class="ms-3 text-sm">@lang('messages.history')</span>
                     </a>
                 </li>
                 <li>
@@ -1298,7 +1353,7 @@
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 24a2.62 2.62 0 0 0 2.623-2.623h-5.246A2.623 2.623 0 0 0 12 24Zm10.407-6.24c-.77-.91-2.186-2.287-2.186-6.647 0-3.395-2.202-6.25-5.313-7.063V3.5a2.908 2.908 0 0 0-5.816 0v.55c-3.111.813-5.313 3.668-5.313 7.063 0 4.36-1.417 5.737-2.186 6.647A1.069 1.069 0 0 0 2.824 19.5h18.352a1.07 1.07 0 0 0 .825-1.74Z" />
                         </svg>
-                        <span class="ms-3 text-sm">Notification</span>
+                        <span class="ms-3 text-sm">@lang('messages.notification')</span>
                     </a>
                 </li>
                 <li>
@@ -1306,22 +1361,23 @@
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M15 14c2.761 0 5-1.239 5-3v-.5C20 9.14 18.373 8 15 8s-5 1.14-5 2.5V11c0 1.761 2.239 3 5 3Zm0 2c-2.608 0-8 1.308-8 4v1h16v-1c0-2.692-5.392-4-8-4ZM9 10c0-1.329.368-2.036 1.151-2.58.748-.521 1.842-.669 3.087-.739-.137-2.247-1.165-3.681-4.238-3.681C6.373 3 4 5.36 4 8.16V9.5C4 10.761 6.239 12 9 12v-2Zm-1 1.974c-2.455 0-5 .729-5 2.383V16h5.303c.011-.4.044-.792.103-1.176-1.189-.55-2.26-1.133-2.406-1.85Z" />
                         </svg>
-                        <span class="ms-3 text-sm">Friends</span>
+                        <span class="ms-3 text-sm">@lang('messages.friends')</span>
                     </a>
 
                 </li>
                 <li>
-                    <a href="#" id="settings-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <a href="{{ route('settings') }}" id="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
                             <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
                             <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                         </svg>
-                        <span class="ms-3 text-sm">Settings</span>
+                        <span class="ms-3 text-sm">@lang('messages.settings')</span>
                     </a>
                 </li>
+
                 <li>
                     <hr class="border-t border-gray-500 w-full mx-0 my-2">
-                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">MISCELLANEOUS</span>
+                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">@lang('messages.miscellaneous')</span>
                 </li>
                 <li>
                     <a href="#" id="info-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -1329,28 +1385,28 @@
                             <path d="M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12 12-5.383 12-12S18.617 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z" />
                             <path d="M11 10h2v7h-2zm0-4h2v2h-2z" />
                         </svg>
-                        <span class="ms-3 text-sm">Info</span>
+                        <span class="ms-3 text-sm">@lang('messages.info')</span>
                     </a>
                 </li>
                 <li>
                     <hr class="border-t border-gray-500 w-full mx-0 my-2">
-                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">ADMIN PANEL</span>
+                    <span class="block px-2 py-1 text-sm font-semibold text-[#FFFFFF] dark:text-[#FFFFFF]">@lang('messages.Admin_panel')</span>
                 </li>
                 <li>
                     <a href="#" id="tambah-link" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <span class="ms-3 text-sm">Tambah</span>
+                        <span class="ms-3 text-sm">@lang('messages.add')</span>
                         <span class="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300">opsional</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <a href="#" id="notif" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M15 14c2.761 0 5-1.239 5-3v-.5C20 9.14 18.373 8 15 8s-5 1.14-5 2.5V11c0 1.761 2.239 3 5 3Zm0 2c-2.608 0-8 1.308-8 4v1h16v-1c0-2.692-5.392-4-8-4ZM9 10c0-1.329.368-2.036 1.151-2.58.748-.521 1.842-.669 3.087-.739-.137-2.247-1.165-3.681-4.238-3.681C6.373 3 4 5.36 4 8.16V9.5C4 10.761 6.239 12 9 12v-2Zm-1 1.974c-2.455 0-5 .729-5 2.383V16h5.303c.011-.4.044-.792.103-1.176-1.189-.55-2.26-1.133-2.406-1.85Z" />
                         </svg>
-                        <span class="ms-3 text-sm">tambah info</span>
+                        <span class="ms-3 text-sm">@lang('messages.add_info')</span>
                     </a>
 
                 </li>
@@ -1360,7 +1416,7 @@
                             <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
                             <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                         </svg>
-                        <span class="ms-3 text-sm">Lainnya</span>
+                        <span class="ms-3 text-sm">@lang('messages.miscellaneous')</span>
                     </a>
                 </li>
             </ul>
@@ -1370,21 +1426,20 @@
 
     <!-- Modal History -->
     <div id="historyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out">
-        <div class="relative w-auto max-w-4xl p-6 bg-gray-900 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out scale-95 opacity-0">
+        <div class="relative w-auto max-w-4xl p-6 bg-[#363434] rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out scale-95 opacity-0">
             <button id="closeModal" class="absolute top-3 right-3 text-white text-xl hover:text-red-400 transition duration-200">
                 &times;
             </button>
 
-            <div class="sticky top-0 bg-gray-900 z-10">
+            <div class="sticky top-0 bg-[#363434] z-10 rounded-md">
                 <div class="flex justify-end -mb-10 pr-1">
-                    <select id="sortOrder" class="p-2 text-sm bg-gray-800 text-white border border-gray-600 rounded">
+                    <select id="sortOrder" class="p-2 text-sm bg-[#2c2a2a] text-white border border-gray-400 rounded">
                         <option value="newest">Terbaru</option>
                         <option value="oldest">Terlama</option>
                     </select>
                 </div>
                 <h3 class="text-3xl text-white font-bold mb-0.5 border-b-2 border-red-600 pb-4">History</h3>
             </div>
-
 
             <div id="historyContainer" class="overflow-y-auto max-h-96 pr-2" style="scrollbar-width: thin; scrollbar-color: #4b5563 #1f2937;">
             </div>
@@ -1393,8 +1448,9 @@
     <!-- Overlay -->
     <div id="overlayBlocker" class="hidden fixed inset-0 bg-black opacity-50"></div>
 
+
     <!-- modal notificatiom -->
-    <div id="notificationModal" class="fixed inset-0 hidden z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="notificationModal" class="fixed inset-0 hidden z-50 overflow-y-auto" style="z-index: 1999;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
 
@@ -1426,8 +1482,25 @@
     </div>
     <!-- end modal notificatiom -->
 
+    <!-- Modal Form Notif -->
+    <div id="form_notif" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" style="z-index: 1999;">
+        <form class="bg-white rounded-lg shadow-lg max-w-sm w-full p-5 relative">
+            <button id="close_modal" type="button" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
+                <i class="bx bx-x text-2xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Tambah informasi</h2>
+            <label for="info-text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">kirim informasi kamu</label>
+            <textarea id="info-text" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-600 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tulis disini..."></textarea>
+            <button type="submit" class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-lg">
+                Kirim
+            </button>
+        </form>
+    </div>
+
+    <!-- end modal form notif -->
+
     <!-- Modal watchlist -->
-    <div id="watchlistModal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50 transition-opacity duration-500 ease-in-out">
+    <div id="watchlistModal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50 transition-opacity duration-500 ease-in-out" style="z-index: 1999;">
         <div class="modal-content relative p-4 w-full max-w-2xl h-full md:h-auto opacity-0 transform scale-95 transition-transform duration-500 ease-in-out">
             <div class="relative bg-white rounded-lg shadow">
                 <div class="flex justify-between items-center p-5 rounded-t border-b">
@@ -1481,6 +1554,7 @@
     <div id="main-content">
         <div class="flex flex-col lg:flex-row my-8 px-4">
             <div class="flex flex-col lg:flex-row my-8 px-4 lg:px-32">
+
                 <div class="relative w-full lg:w-3/4 lg:mr-16 h-[500px] cursor-pointer overflow-hidden">
                     <div class="slider h-full">
                         <div class="slides h-full flex">
@@ -1512,10 +1586,11 @@
                                         </a>
 
                                         <div class="info-content flex flex-col">
-                                            <h2 class="text-4xl font-extrabold text-slate-900 mb-2 text-shadow-md">{{ $item->title }}</h2>
-                                            <p class="text-base text-black mb-4 text-shadow-md">{{ Str::limit($item->deskripsi, 30, '...') }}</p>
+                                            <h2 class="gudeg text-4xl font-extrabold  mb-2 text-shadow-md">{{ $item->title }}</h2>
+                                            <p class="gudeg text-base mb-4 text-shadow-md">{{ Str::limit($item->deskripsi, 30, '...') }}</p>
                                             <div class="video-duration text-slate-600 font-bold" id="slider-duration-{{ $loop->index }}"></div>
                                         </div>
+
                                     </div>
 
                                     <div class="text-content-center">
@@ -1544,8 +1619,8 @@
 
 
                 <!-- Recommendations Section -->
-                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8 bg-black bg-opacity-75 rounded-lg p-4 shadow-lg shadow-black">
-                    <h1 class="text-black text-xl font-bold mb-4 px-4 py-2 rounded-lg">
+                <div class="w-full lg:w-1/3 lg:mt-0 flex flex-col ml-4 lg:ml-8 bg-black bg-opacity-75 rounded-lg p-4 shadow-lg shadow-black transition-all duration-300 ease-in-out">
+                    <h1 class="text-black text-lg lg:text-xl font-bold mb-4 px-4 py-2 rounded-lg whitespace-nowrap overflow-hidden truncate">
                         <span class="border-l-4 border-red-600 pl-2 text-white">{{ __('Recommended Movies') }}</span>
                     </h1>
 
@@ -1584,7 +1659,7 @@
         <!-- Top Onema This Week Section -->
         <div class="px-32 my-8">
             <h1 class="text-black text-xl font-bold px-0 py-2 mb-6 inline-block rounded-r-lg ml-6">
-                <span class="border-l-4 border-red-700 pl-2">Top Onema</span>
+                <span class="border-l-4 border-red-700 pl-2 gudeg">Top Onema</span>
             </h1>
             <div id="no-results-message" class="hidden text-center text-red-500 font-semibold my-6">
                 Tidak ditemukan
@@ -1632,9 +1707,9 @@
                             </div>
                         </div>
 
-                        <div class="bg-black bg-opacity-75 p-2 rounded-b-lg">
+                        <div class="bg-opacity-75 p-2 rounded-b-lg backgroundd">
                             <!-- Rating stars -->
-                            <div class="flex items-center text-white text-xs mb-2"> 
+                            <div class="flex items-center text-white text-xs mb-2">
                                 <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                     <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
                                 </svg>
@@ -1668,6 +1743,23 @@
     <!--end home-->
 
     <script>
+        function filterContent(filter) {
+            window.location.href = `{{ route('menu') }}?filter=${filter}`;
+        }
+
+
+
+        // set tema
+        function applyThemeFromLocalStorage() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.body.className = theme;
+        }
+        applyThemeFromLocalStorage();
+    </script>
+
+
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Popup menu
             const menuLink = document.getElementById('menu-link');
@@ -1693,6 +1785,7 @@
                 });
             }
 
+
             //modal notification
             document.getElementById('notificationBtn').addEventListener('click', function(event) {
                 event.preventDefault();
@@ -1703,7 +1796,20 @@
                 document.getElementById('notificationModal').classList.remove('active');
             });
 
-            // Mendapatkan elemen yang diperlukan
+            //form notif
+            document.getElementById('notif').addEventListener('click', function(event) {
+                event.preventDefault();
+                const modal = document.getElementById('form_notif');
+                modal.classList.remove('hidden');
+            });
+
+            document.getElementById('close_modal').addEventListener('click', function() {
+                const modal = document.getElementById('form_notif');
+                modal.classList.add('hidden');
+            });
+
+
+            // watchlist
             const watchlistLink = document.getElementById('watchlist-link');
             const watchlistModal = document.getElementById('watchlistModal');
             const watchlistCloseButton = watchlistModal.querySelector('[data-watchlist-hide="watchlistModal"]');
@@ -1763,7 +1869,7 @@
 
 
 
-            //modal history
+            // modal history
             const historyButton = document.getElementById('historyButton');
             const historyModal = document.getElementById('historyModal');
             const closeModalButton = document.getElementById('closeModal');
@@ -1771,15 +1877,30 @@
             const historyContainer = document.getElementById('historyContainer');
             const sortOrderSelect = document.getElementById('sortOrder');
 
-            function renderHistory(savedHistory) {
+            function renderHistory(savedHistory, sortOrder = 'newest') {
                 historyContainer.innerHTML = '';
 
-                savedHistory.forEach(function(item, index) {
+                if (sortOrder === 'newest') {
+                    savedHistory.sort((a, b) => b.timestamp - a.timestamp);
+                } else {
+                    savedHistory.sort((a, b) => a.timestamp - b.timestamp);
+                }
+
+                if (savedHistory.length === 0) {
+                    historyContainer.innerHTML = `
+            <div class="flex items-center justify-center h-full p-4 bg-gray-400 rounded-lg">
+                <p class="text-white text-center">Tidak ada history untuk ditampilkan.</p>
+            </div>
+        `;
+                    return;
+                }
+
+                savedHistory.forEach((item, index) => {
                     let date = new Date(item.timestamp);
                     let formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 
                     let historyItem = `
-            <div class="history-item flex mb-4 p-4 bg-gray-800 rounded-lg">
+            <div class="history-item flex mb-4 p-4 bg-[#2c2a2a] rounded-lg">
                 <img src="${item.poster}" alt="Poster Image" class="rounded-lg w-32 h-48 object-cover mr-4">
                 <div class="flex flex-col justify-between">
                     <div>
@@ -1789,7 +1910,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <p class="text-sm text-gray-500">${formattedDate}</p>
-                        <button class="deleteHistoryButton text-red-500 pl-5" data-index="${index}">Hapus</button>
+                          <button class="deleteHistoryButton text-red-500 p-2 text-sm bg-red-600 m-2 hover:bg-red-800 text-white duration-200 transition rounded-lg" data-index="${index}">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -1804,7 +1925,7 @@
                         const index = this.getAttribute('data-index');
                         savedHistory.splice(index, 1);
                         localStorage.setItem('videoHistory', JSON.stringify(savedHistory));
-                        renderHistory(savedHistory);
+                        renderHistory(savedHistory, sortOrderSelect.value);
                     });
                 });
             }
@@ -1813,20 +1934,13 @@
                 event.preventDefault();
 
                 let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
-
-                sortOrderSelect.addEventListener('change', function() {
-                    if (this.value === 'newest') {
-                        savedHistory.sort((a, b) => b.timestamp - a.timestamp);
-                    } else {
-                        savedHistory.sort((a, b) => a.timestamp - b.timestamp);
-                    }
-                    renderHistory(savedHistory);
-                });
-
-                renderHistory(savedHistory);
+                renderHistory(savedHistory, sortOrderSelect.value);
 
                 historyModal.classList.remove('hidden');
                 overlayBlocker.classList.remove('hidden');
+
+                document.body.classList.add('overflow-hidden');
+
                 setTimeout(() => {
                     historyModal.querySelector('.relative').classList.remove('scale-95', 'opacity-0');
                     historyModal.querySelector('.relative').classList.add('scale-100', 'opacity-100');
@@ -1838,19 +1952,19 @@
                 setTimeout(() => {
                     historyModal.classList.add('hidden');
                     overlayBlocker.classList.add('hidden');
+
+                    document.body.classList.remove('overflow-hidden');
                 }, 300);
             });
 
-            window.addEventListener('click', function(event) {
-                if (event.target === overlayBlocker) {
-                    historyModal.querySelector('.relative').classList.add('scale-95', 'opacity-0');
-                    setTimeout(() => {
-                        historyModal.classList.add('hidden');
-                        overlayBlocker.classList.add('hidden');
-                    }, 300);
-                }
+            overlayBlocker.addEventListener('click', function(event) {
+                event.stopPropagation();
             });
 
+            sortOrderSelect.addEventListener('change', function() {
+                let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
+                renderHistory(savedHistory, this.value);
+            });
 
 
             //watchlist
@@ -2152,7 +2266,7 @@
                     }
                 });
 
-                const topOnemaSection = document.querySelector('.px-32');
+                const topOnemaSection = document.querySelector('.px-32 text-black');
                 if (topOnemaSection) {
                     topOnemaSection.scrollIntoView({
                         behavior: 'smooth'
@@ -2175,8 +2289,8 @@
                     const query = this.value;
 
                     if (query && !searchHistory.includes(query)) {
-                        searchHistory.unshift(query); 
-                        localStorage.setItem('searchHistory', JSON.stringify(searchHistory)); 
+                        searchHistory.unshift(query);
+                        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
                         updateSearchHistory();
                     }
 
@@ -2227,9 +2341,6 @@
 
                 searchHistoryContainer.classList.remove('hidden');
             }
-
-
-
 
 
             //tambah

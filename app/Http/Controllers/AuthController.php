@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
 
 
 class AuthController extends Controller
@@ -116,5 +116,32 @@ class AuthController extends Controller
         }
 
         return back()->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    public function getLoggedInUser()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tidak ada pengguna yang sedang login.'
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $user
+        ]);
+    }
+
+    public function getAllUsers()
+    {
+        $users = User::all();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $users
+        ]);
     }
 }

@@ -378,10 +378,36 @@
         background-color: #d33 !important;
         border-color: #d33 !important;
     }
+
+    body.light {
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    body.light .text-content {
+        color: #333333;
+    }
+
+    body.dark {
+        background-color: gray;
+        color: #ffffff;
+    }
+
+    body.dark .text-content {
+        color: #aaaaaa;
+    }
+
+    body.dark-mode .text-dark {
+        color: white;
+    }
+
+    body.dark-mode .text-dark-muted {
+        color: #e2e8f0;
+    }
 </style>
 
-<body>
-    <header class="bg-[#E52B09] shadow-md" style="box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);">
+<body class="font-poppins {{ session('theme', 'light') }}" id="bodyTheme">
+    <header class="bg-[#E52B09] shadow-md  {{ session('theme', 'light') }}" style="box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);">
         <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-12">
@@ -494,9 +520,9 @@
                 <!-- Rating  -->
                 <div class="flex items-center text-white">
                     @php
-                    $averageRating = $detail->averageRating(); 
-                    $fullStars = floor($averageRating); 
-                    $halfStar = $averageRating - $fullStars >= 0.5 ? true : false; 
+                    $averageRating = $detail->averageRating();
+                    $fullStars = floor($averageRating);
+                    $halfStar = $averageRating - $fullStars >= 0.5 ? true : false;
                     $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
                     @endphp
 
@@ -746,19 +772,22 @@
                 });
             });
 
-            const historyData = {
-                title: document.querySelector('h2').textContent,
-                poster: '{{ asset("upload/" . $detail->poster) }}', 
-                genre: document.querySelector('.text-gray-400').textContent,
-                year: document.querySelectorAll('.text-gray-400')[1].textContent,
-                timestamp: Date.now() 
-            };
+                const historyData = {
+                    title: document.querySelector('h2').textContent,
+                    poster: '{{ asset("upload/" . $detail->poster) }}',
+                    genre: document.querySelector('.text-gray-400').textContent,
+                    year: document.querySelectorAll('.text-gray-400')[1].textContent,
+                    timestamp: Date.now()
+                };
 
-            let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
+                let savedHistory = JSON.parse(localStorage.getItem('videoHistory')) || [];
 
-            savedHistory.push(historyData);
+                const isAlreadyInHistory = savedHistory.some(item => item.title === historyData.title);
 
-            localStorage.setItem('videoHistory', JSON.stringify(savedHistory));
+                if (!isAlreadyInHistory) {
+                    savedHistory.push(historyData);
+                    localStorage.setItem('videoHistory', JSON.stringify(savedHistory));
+                }
 
 
             // Hapus komentar
@@ -831,13 +860,13 @@
                     text: "Anda akan menghapus rating ini!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33', 
-                    cancelButtonColor: '#808080', 
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#808080',
                     confirmButtonText: 'Ya, hapus!',
                     cancelButtonText: 'Batal',
-                    width: '300px', 
+                    width: '300px',
                     customClass: {
-                        popup: 'small-popup bg-gray-800', 
+                        popup: 'small-popup bg-gray-800',
                         title: 'popup-title',
                         content: 'popup-content',
                         confirmButton: 'confirm-btn',
@@ -862,7 +891,7 @@
                                         confirmButtonColor: '#d33',
                                         width: '300px',
                                         customClass: {
-                                            popup: 'small-popup bg-gray-800', 
+                                            popup: 'small-popup bg-gray-800',
                                             title: 'popup-title',
                                             content: 'popup-content',
                                             confirmButton: 'confirm-btn'
@@ -870,7 +899,7 @@
                                     });
 
                                     setTimeout(function() {
-                                        location.reload(); 
+                                        location.reload();
                                     }, 2000);
                                 } else {
                                     Swal.fire({
@@ -897,7 +926,7 @@
 
 
             // Hover rating
-            let selectedRating = 0; 
+            let selectedRating = 0;
 
             const stars = document.querySelectorAll('#star-rating .empty-star');
 
@@ -907,7 +936,7 @@
                 });
 
                 star.addEventListener('mouseleave', function() {
-                    if (selectedRating === 0) { 
+                    if (selectedRating === 0) {
                         resetStars();
                     } else {
                         selectStars(selectedRating - 1);
@@ -916,13 +945,13 @@
 
                 star.addEventListener('click', function() {
                     selectStars(index);
-                    selectedRating = index + 1; 
+                    selectedRating = index + 1;
                 });
             });
 
             function highlightStars(index) {
                 stars.forEach((star, i) => {
-                    if (i <= index) { 
+                    if (i <= index) {
                         star.classList.add('selected');
                     } else {
                         star.classList.remove('selected');
@@ -937,11 +966,11 @@
             }
 
             function selectStars(index) {
-                selectedRating = index + 1; 
-                document.getElementById('rating-value').value = selectedRating; 
+                selectedRating = index + 1;
+                document.getElementById('rating-value').value = selectedRating;
 
                 stars.forEach((star, i) => {
-                    if (i <= index) { 
+                    if (i <= index) {
                         star.classList.add('selected');
                     } else {
                         star.classList.remove('selected');
@@ -952,7 +981,7 @@
             // Rating
             document.querySelectorAll('#star-rating svg').forEach(star => {
                 star.addEventListener('click', function() {
-                    const rating = parseInt(this.getAttribute('data-value')); 
+                    const rating = parseInt(this.getAttribute('data-value'));
 
                     document.querySelectorAll('#star-rating svg').forEach(s => s.classList.remove('active'));
 
@@ -1011,7 +1040,7 @@
                                 }
 
                                 setTimeout(function() {
-                                    location.reload(); 
+                                    location.reload();
                                 }, 2000);
                             }
                         })
@@ -1124,7 +1153,7 @@
                         $('#chat-messages').append(newComment);
                         $('#comment-form')[0].reset();
 
-                        location.reload(); 
+                        location.reload();
                     },
                     error: function(xhr) {
                         console.error('Gagal mengirim komentar:', xhr.statusText);
@@ -1155,7 +1184,7 @@
 
                         if (response.status === 'liked') {
                             likeButton.find('i').addClass('text-red-600');
-                            dislikeButton.find('i').removeClass('text-red-600'); 
+                            dislikeButton.find('i').removeClass('text-red-600');
                         } else {
                             likeButton.find('i').removeClass('text-red-600');
                         }
@@ -1188,7 +1217,7 @@
 
                         if (response.status === 'disliked') {
                             dislikeButton.find('i').addClass('text-red-600');
-                            likeButton.find('i').removeClass('text-red-600'); 
+                            likeButton.find('i').removeClass('text-red-600');
                         } else {
                             dislikeButton.find('i').removeClass('text-red-600');
                         }
@@ -1219,7 +1248,7 @@
             });
 
             $(document).on('submit', '.reply-form', function(event) {
-                event.preventDefault(); 
+                event.preventDefault();
 
                 let form = $(this);
                 let commentId = form.data('id');
@@ -1264,9 +1293,9 @@
                 </div>
                 </div>
             `;
-                        form.before(newReply); 
+                        form.before(newReply);
                         form.find('.reply-input').val('');
-                        form.addClass('hidden'); 
+                        form.addClass('hidden');
                     },
                     error: function(xhr) {
                         console.error('Gagal mengirim balasan:', xhr.statusText);

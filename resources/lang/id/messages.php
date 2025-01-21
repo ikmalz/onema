@@ -1,0 +1,35 @@
+<?php
+
+return [
+    'my_collection' => 'Koleksi Saya',
+    'history' => 'Riwayat',
+    'notification' => 'Notifikasi',
+    'friends' => 'Teman',
+    'settings' => 'Pengaturan',
+    'info' => 'Info',
+    'admin_panel' => 'Panel Admin',
+    'add' => 'Tambah',
+    'add_info' => 'Tambah Info',
+    'miscellaneous' => 'Lainnya',
+    'general' => 'Umum',
+    'Admin_panel' => 'Ruang admin',
+    'Requirements_for_movie_reviews' => 'Persyaratan untuk review film:',
+    'settings' => 'pengaturan',
+    'back' => 'kembali',
+    'theme' => 'Tema',
+    'dark' => 'gelap',
+    'languange' => 'Bahasa',
+    'english' => 'Inggris',
+    'minimumcharacter' => 'Minimal 10 karakter untuk ulasan.',
+    'At_least' => 'Setidaknya satu huruf kecil.',
+    'includeon' => 'Sertakan satu karakter khusus, seperti ! @ # ?.',
+    'warning' => 'Hati-hati',
+    'Pleasenote' => 'Harap dicatat bahwa:',
+    'reviewthat' => 'Ulasan yang tidak memenuhi persyaratan tidak akan dipublikasikan.',
+    'please' => 'Harap jangan menggunakan bahasa yang menyinggung atau tidak pantas.',
+    'must' => 'Review harus relevan dengan film yang direview.',
+    'take' => 'Mohon luangkan waktu sejenak untuk memberikan penilaian yang jujur ​​dan konstruktif setelah menonton video trailer ini, karena pendapat Anda sangat berarti dan dapat membantu pengguna lain membuat pilihan yang tepat berdasarkan preferensi mereka. Dengan memberikan penilaian yang sesuai, Anda berperan dalam menciptakan lingkungan yang informatif dan membantu orang lain menemukan konten yang benar-benar mereka sukai, sehingga menjadikan pengalaman menonton lebih menyenangkan dan bermakna.',
+    'we' => 'Selain itu, kami sangat menghargai partisipasi Anda dalam komunitas kami, karena setiap peringkat tidak hanya berdampak pada konten yang ditampilkan namun juga memberikan umpan balik yang berharga bagi kami untuk terus meningkatkan kualitas layanan yang kami tawarkan. Dengan berbagi pemikiran dan pengalaman, Anda berkontribusi terhadap pengembangan platform ini, menjadikannya tempat yang lebih baik bagi semua pengguna yang mencari informasi dan hiburan berkualitas.',
+    'understand' => 'Paham'
+
+];
