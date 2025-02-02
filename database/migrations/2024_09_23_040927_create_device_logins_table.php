@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('device_logins', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('device')->nullable();  // Identifikasi perangkat (contoh: User-Agent atau UUID perangkat)
+            $table->string('device')->nullable();  
             $table->timestamps();
 
-            // Relasi ke tabel users
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -12,9 +12,15 @@ return new class extends Migration
     public function up()
     {
         Schema::table('like_comments', function (Blueprint $table) {
-            $table->dropColumn(['username', 'comment_text']);
+            if (Schema::hasColumn('like_comments', 'username')) {
+                $table->dropColumn('username');
+            }
+            if (Schema::hasColumn('like_comments', 'comment_text')) {
+                $table->dropColumn('comment_text');
+            }
         });
     }
+    
 
 
     /**

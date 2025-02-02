@@ -10,14 +10,15 @@ class HistoryController extends Controller
 {
     public function getUserHistory()
     {
-        if (Auth::check()) {
-            $historyItems = Watchlist::where('user_id', Auth::id())
-                ->with('trailer')
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-            return response()->json($historyItems);
+        if (!Auth::check()) {
+            return response()->json([]);
         }
-        return response()->json([]);
+
+        $historyItems = Watchlist::where('user_id', Auth::id())
+            ->with('trailer')
+            ->latest()
+            ->get();
+
+        return response()->json($historyItems);
     }
 }

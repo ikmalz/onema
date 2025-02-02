@@ -18,13 +18,14 @@ class WatchlistController extends Controller
         if ($existingWatchlist) {
             $existingWatchlist->delete();
             return response()->json(['status' => 'removed']);
-        } else {
-            Watchlist::create([
-                'user_id' => $userId,
-                'trailer_id' => $trailerId,
-            ]);
-            return response()->json(['status' => 'added']);
         }
+
+        Watchlist::create([
+            'user_id' => $userId,
+            'trailer_id' => $trailerId,
+        ]);
+
+        return response()->json(['status' => 'added']);
     }
 
     public function watchlist()

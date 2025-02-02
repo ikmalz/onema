@@ -14,19 +14,26 @@ class MenuController extends Controller
         $query = Trailer::withCount(['likes', 'dislikes', 'comments'])
             ->withAvg('ratings', 'rating');
 
-        if ($filter === 'rating_tertinggi') {
-            $trailers = $query->orderBy('ratings_avg_rating', 'desc')->get();
-        } elseif ($filter === 'film_populer') {
-            $trailers = $query->orderBy('likes_count', 'desc')
-                ->orderBy('comments_count', 'desc')
-                ->get();
-        } elseif ($filter === 'film_terbaru') {
-            $trailers = $query->orderBy('tahun', 'desc')->get();
-        } elseif ($filter === 'serial_tv') {
-            $trailers = $query->inRandomOrder()->get();
-        } else {
-            $trailers = $query->get();
+        switch ($filter) {
+            case 'rating_tertinggi':
+                $query->orderBy('ratings_avg_rating', 'desc');
+                break;
+
+            case 'film_populer':
+                $query->orderBy('likes_count', 'desc')
+                    ->orderBy('comments_count', 'desc');
+                break;
+
+            case 'film_terbaru':
+                $query->orderBy('tahun', 'desc');
+                break;
+
+            case 'serial_tv':
+                $query->inRandomOrder();
+                break;
         }
+
+        $trailers = $query->get();
 
         return view('home.menu', compact('trailers', 'filter'));
     }

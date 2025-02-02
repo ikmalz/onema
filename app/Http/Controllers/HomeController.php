@@ -8,8 +8,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -17,6 +15,7 @@ class HomeController extends Controller
     {
         $slider = DB::table('_trailer')->inRandomOrder()->get();
         $recommendations = DB::table('_trailer')->inRandomOrder()->limit(3)->get();
+        
         $topOnema = Trailer::withCount(['likes', 'dislikes'])
             ->with('ratings')
             ->orderBy('populer', 'desc')
@@ -24,15 +23,18 @@ class HomeController extends Controller
 
         $availableAccounts = User::where('id', '!=', Auth::id())->get();
 
-        $watchlistItems = Watchlist::where('user_id', Auth::id())->with('trailer')->get();
+        $watchlistItems = Watchlist::where('user_id', Auth::id())
+            ->with('trailer')
+            ->get();
 
-        return view('home.homepage', compact('slider', 'recommendations', 'topOnema', 'availableAccounts', 'watchlistItems'));
+        return view('home.homepage', compact(
+            'slider', 'recommendations', 'topOnema', 
+            'availableAccounts', 'watchlistItems'
+        ));
     }
-
 
     public function ikmal()
     {
         return view('home.detail');
     }
-
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 
-
 class SettingsController extends Controller
 {
     public function settings()
@@ -30,7 +29,6 @@ class SettingsController extends Controller
         return response()->json(['message' => 'Settings saved successfully']);
     }
 
-
     public function updateTheme(Request $request)
     {
         $theme = $request->input('theme');
@@ -42,6 +40,7 @@ class SettingsController extends Controller
     {
         $request->validate(['theme' => 'required|in:light,dark']);
         session(['theme' => $request->theme]);
+
         return response()->json(['message' => 'Theme updated successfully']);
     }
 
@@ -49,6 +48,7 @@ class SettingsController extends Controller
     {
         $request->validate(['theme' => 'required|string']);
         session(['theme' => $request->theme]);
+
         return response()->json(['success' => true]);
     }
 
@@ -56,8 +56,9 @@ class SettingsController extends Controller
     {
         $request->validate(['language' => 'required|in:en,id']);
         session(['locale' => $request->language]);
+
         App::setLocale($request->language);
+
         return response()->json(['message' => 'Language changed successfully']);
     }
-
 }

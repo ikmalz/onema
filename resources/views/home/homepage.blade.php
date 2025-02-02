@@ -1453,7 +1453,6 @@
     <div id="notificationModal" class="fixed inset-0 hidden z-50 overflow-y-auto" style="z-index: 1999;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
-
             <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
@@ -1465,8 +1464,7 @@
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">Notification</h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    You have new notifications!
+                                <p id="notif-content" class="text-sm text-gray-500">
                                 </p>
                             </div>
                         </div>
@@ -1484,7 +1482,7 @@
 
     <!-- Modal Form Notif -->
     <div id="form_notif" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" style="z-index: 1999;">
-        <form class="bg-white rounded-lg shadow-lg max-w-sm w-full p-5 relative">
+        <form id="notifForm" class="bg-white rounded-lg shadow-lg max-w-sm w-full p-5 relative">
             <button id="close_modal" type="button" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
                 <i class="bx bx-x text-2xl"></i>
             </button>
@@ -1784,6 +1782,49 @@
                     }, 500);
                 });
             }
+
+            //form notif
+            document.querySelector('form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const message = document.getElementById('info-text').value;
+
+                fetch('/notifications', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: JSON.stringify({
+                            message
+                        }),
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            alert(data.message);
+                            document.getElementById('info-text').value = '';
+                            fetchNotifications();
+                        }
+                    });
+            });
+
+            function fetchNotifications() {
+                fetch('/notifications')
+                    .then((response) => response.json())
+                    .then((notifications) => {
+                        const modalBody = document.querySelector('#notificationModal .text-sm');
+                        modalBody.innerHTML = '';
+
+                        notifications.forEach((notif) => {
+                            const p = document.createElement('p');
+                            p.textContent = notif.message;
+                            modalBody.appendChild(p);
+                        });
+                    });
+            }
+            document.querySelector('#notificationModal').addEventListener('show', fetchNotifications);
+
 
 
             //modal notification

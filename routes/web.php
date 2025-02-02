@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WatchlistController;
 use App\Models\Profile;
@@ -44,7 +45,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('actionLogout');
 Route::post('formAction', [MovieController::class, 'create'])->name('form.action');
 
 //detail
-Route::get('/detail/{id}', [HomeController::class, 'show'])->name('home.detail');
+Route::get('/detail/{id}', [MovieController::class, 'show'])->name('home.detail');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
     
 Route::post('/trailer/{id}/comment', [MovieController::class, 'storeComment'])->name('comment.store');
@@ -85,12 +86,8 @@ Route::get('change-language/{locale}', function ($locale) {
 
 Route::get('/menu', [MenuController::class, 'menu'])->name('menu');
 
-
-
-
-
-
-
+Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+Route::get('/notifications', [NotificationController::class, 'fetchNotifications'])->name('notifications.fetch');
 
 
 

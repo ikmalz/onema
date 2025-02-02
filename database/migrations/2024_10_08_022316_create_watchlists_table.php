@@ -13,14 +13,16 @@ class CreateWatchlistsTable extends Migration
      */
     public function up()
     {
-        Schema::create('watchlists', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('trailer_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-        
+        if (!Schema::hasTable('watchlists')) { 
+            Schema::create('watchlists', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->foreignId('trailer_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
+    
 
     /**
      * Reverse the migrations.
